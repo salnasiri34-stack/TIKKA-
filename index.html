@@ -3,51 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تطبيق تكا - لوحة الطلبات</title>
+    <title>تكة - Tikka | منصة التوصيل الحية</title>
     <style>
-        body {
-            font-family: Tahoma, sans-serif;
-            background-color: #f4f7f6;
-            text-align: center;
-            padding: 50px;
-        }
-        .container {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
-            display: inline-block;
-        }
-        button {
-            background-color: #ff4757;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            font-size: 18px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        button:hover {
-            background-color: #ff6b81;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Tahoma, sans-serif; }
+        body { background-color: #f4f6f8; color: #333; }
+        header { background-color: #d70f64; color: white; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .logo { font-size: 22px; font-weight: bold; }
+        .nav-tabs button { background: none; border: none; color: white; font-size: 16px; margin-right: 15px; cursor: pointer; font-weight: bold; opacity: 0.8; }
+        .nav-tabs button.active { opacity: 1; border-bottom: 2px solid white; padding-bottom: 3px; }
+        .container { max-width: 1000px; margin: 25px auto; padding: 0 15px; }
+        .section { display: none; }
+        .section.active { display: block; }
+        
+        /* البطاقات والمطاعم */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .card-img { height: 130px; background: #ffebee; display: flex; align-items: center; justify-content: center; font-size: 35px; color: #d70f64; }
+        .card-body { padding: 15px; }
+        .card-title { font-size: 17px; font-weight: bold; margin-bottom: 5px; }
+        .card-desc { font-size: 13px; color: #666; margin-bottom: 12px; }
+        .btn { width: 100%; background-color: #d70f64; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .btn:hover { background-color: #b50b52; }
+
+        /* لوحة تحكم الأدمن والطلبات الحية */
+        .order-box { background: white; padding: 15px 20px; border-radius: 10px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 4px rgba(0,0,0,0.05); border-right: 5px solid #d70f64; }
+        .order-info h4 { font-size: 16px; color: #222; margin-bottom: 4px; }
+        .order-info p { font-size: 13px; color: #777; }
+        .status-badge { background: #fff3cd; color: #856404; padding: 5px 12px; border-radius: 15px; font-size: 12px; font-weight: bold; }
+        .admin-actions button { padding: 6px 12px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-right: 5px; }
+        .accept-btn { background: #28a745; color: white; }
+        .complete-btn { background: #007bff; color: white; }
     </style>
 </head>
 <body>
 
+    <header>
+        <div class="logo">تكة | Tikka 🛵</div>
+        <div class="nav-tabs">
+            <button class="active" onclick="switchTab('customer', this)">واجهة العميل</button>
+            <button onclick="switchTab('admin', this)">لوحة تحكم المتجر (Admin)</button>
+        </div>
+    </header>
+
     <div class="container">
-        <h2>مطعم تكا - نظام الطلبات</h2>
-        <p>اضغط على الزر أدناه لإرسال طلب تجريبي مباشرة إلى قاعدة البيانات في Firebase:</p>
-        <button id="sendDataBtn">إرسال طلب جديد</button>
+        
+        <!-- قسم العميل -->
+        <div id="customer" class="section active">
+            <h2>اختر وجبتك المفضلة</h2>
+            <div class="grid">
+                <div class="card">
+                    <div class="card-img">🍗</div>
+                    <div class="card-body">
+                        <div class="card-title">وجبة تكا ملكي</div>
+                        <div class="card-desc">دجاج مشوي فريش مع صوص الثوم والبطاطس المقرمشة</div>
+                        <button class="btn" onclick="placeOrder('وجبة تكا ملكي', 35)">اطلب الآن (35 ريال)</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-img">🌯</div>
+                    <div class="card-body">
+                        <div class="card-title">ساندوتش تكا صاروخ</div>
+                        <div class="card-desc">خبز صاج حار بحشوة الدجاج المميزة</div>
+                        <button class="btn" onclick="placeOrder('ساندوتش تكا صاروخ', 18)">اطلب الآن (18 ريال)</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- قسم لوحة التحكم الحية -->
+        <div id="admin" class="section">
+            <h2>الطلبات الواردة للمتجر (تحديث مباشر ⚡)</h2>
+            <div id="ordersContainer">
+                <p style="color: #777;">جاري تحميل الطلبات الحية...</p>
+            </div>
+        </div>
+
     </div>
 
-    <!-- أكواد ربط Firebase الخاصة بمشروعك -->
+    <!-- Firebase والربط الحقيقي -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
-        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, updateDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // إعدادات مشروعك الأساسية
         const firebaseConfig = {
             apiKey: "AIzaSyCbT5oJoSWA31DDkfuZ1pHmcjjUh_PiLmw",
             authDomain: "tikka-0.firebaseapp.com",
@@ -58,25 +95,69 @@
             measurementId: "G-6BEGNPD4B6"
         };
 
-        // تهيئة Firebase والخدمات
         const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
         const db = getFirestore(app);
 
-        // إرسال البيانات لقاعدة البيانات عند الضغط على الزر
-        document.getElementById('sendDataBtn').addEventListener('click', async () => {
+        // التنقل بين الشاشات
+        window.switchTab = function(tabId, btn) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-tabs button').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        // إرسال الطلب من قِبل العميل
+        window.placeOrder = async function(item, price) {
             try {
                 await addDoc(collection(db, "orders"), {
-                    item: "وجبة تكا دجاج",
-                    status: "قيد الإعداد",
-                    createdAt: new Date()
+                    item: item,
+                    price: price + " ريال",
+                    status: "قيد المراجعة",
+                    time: serverTimestamp()
                 });
-                alert("تم إرسال الطلب بنجاح إلى Firebase يا سلومي!");
+                alert("تم إرسال طلبك بنجاح! تابع لوحة التحكم لرؤية التحديثات الحية 🚀");
             } catch (e) {
-                console.error("خطأ أثناء الإرسال: ", e);
-                alert("صار فيه خطأ، تأكد من تفعيل Firestore Database من لوحة تحكم Firebase.");
+                alert("حدث خطأ أثناء إرسال الطلب، تأكد من إعدادات قاعدة البيانات.");
             }
+        }
+
+        // تحديث الطلبات لحظياً في لوحة التحكم (Real-time listener)
+        const container = document.getElementById('ordersContainer');
+        onSnapshot(collection(db, "orders"), (snapshot) => {
+            container.innerHTML = "";
+            if (snapshot.empty) {
+                container.innerHTML = "<p style='color: #777;'>لا توجد طلبات جديدة حالياً.</p>";
+                return;
+            }
+            snapshot.forEach((docSnap) => {
+                const data = docSnap.data();
+                const id = docSnap.id;
+                
+                let div = document.createElement('div');
+                div.className = 'order-box';
+                div.innerHTML = `
+                    <div class="order-info">
+                        <h4>${data.item} (${data.price})</h4>
+                        <p>الحالة: <span class="status-badge">${data.status}</span></p>
+                    </div>
+                    <div class="admin-actions">
+                        <button class="accept-btn" onclick="updateStatus('${id}', 'جاري التحضير 👨‍🍳')">قبول</button>
+                        <button class="complete-btn" onclick="updateStatus('${id}', 'تم التوصيل بنجاح ✅')">إتمام</button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
         });
+
+        // تحديث حالة الطلب من الأدمن
+        window.updateStatus = async function(id, newStatus) {
+            try {
+                const orderRef = doc(db, "orders", id);
+                await updateDoc(orderRef, { status: newStatus });
+            } catch (e) {
+                console.error("خطأ في التحديث:", e);
+            }
+        };
     </script>
 </body>
 </html>
