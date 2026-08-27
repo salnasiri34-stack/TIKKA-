@@ -1,18 +1,19 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-<head><!-- أيقونة التطبيق الخاصة بأجهزة أبل (iOS Touch Icon) -->
-<link rel="apple-touch-icon" href="images/logo.png">
-<link rel="apple-touch-icon" sizes="152x152" href="images/logo-152.png">
-<link rel="apple-touch-icon" sizes="180x180" href="images/logo-180.png">
-<link rel="apple-touch-icon" sizes="167x167" href="images/logo-167.png">
+<head>
+    <!-- أيقونة التطبيق الخاصة بأجهزة أبل (iOS Touch Icon) -->
+    <link rel="apple-touch-icon" href="images/logo.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="images/logo-152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="images/logo-180.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="images/logo-167.png">
 
-<!-- تفعيل وضع تطبيق الويب على آبل (إخفاء شريط المتصفح) -->
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="اسم تطبيقك">
+    <!-- تفعيل وضع تطبيق الويب على آبل (إخفاء شريط المتصفح) -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="تكة | Tikka">
 
-<!-- ربط ملف الـ Manifest العام -->
-<link rel="manifest" href="manifest.json">
+    <!-- ربط ملف الـ Manifest العام -->
+    <link rel="manifest" href="manifest.json">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تكة | Tikka - التطبيق الاحترافي المتكامل</title>
@@ -82,11 +83,11 @@
     <!-- 1. شاشة الدخول -->
     <div id="authScreen" class="screen active">
         <div class="auth-box">
-            <img src="https://raw.githubusercontent.com/1-saloomy/tikka-assets/main/logo.png" style="width:70px; height:70px; border-radius:50%; border:2px solid #d4af37; margin-bottom:15px; object-fit:cover;" onerror="this.src=''">
+            <img src="https://raw.githubusercontent.com/1-saloomy/tikka-assets/main/logo.png" style="width:70px; height:70px; border-radius:50%; border:2px solid #d4af37; margin-bottom:15px; object-fit:cover;" onerror="this.style.display='none'">
             <h2>تكة | Tikka</h2>
             <p style="color: #888; font-size: 13px; margin-bottom: 20px;">تسجيل الدخول لتجربة التوصيل الأذكى</p>
             <input type="text" id="userName" class="auth-input" placeholder="اسمك الكريم (مثلاً: سلومي)">
-            <input type="text" id="userPhone" class="auth-input" placeholder="رقم الجوال">
+            <input type="tel" id="userPhone" class="auth-input" placeholder="رقم الجوال">
             <button class="auth-btn" onclick="login()">دخول التطبيق</button>
         </div>
     </div>
@@ -95,7 +96,7 @@
     <div id="appScreen" class="screen">
         <header>
             <div class="logo-area">
-                <img src="https://raw.githubusercontent.com/1-saloomy/tikka-assets/main/logo.png" class="logo-img" onerror="this.src=''">
+                <img src="https://raw.githubusercontent.com/1-saloomy/tikka-assets/main/logo.png" class="logo-img" onerror="this.style.display='none'">
                 <div class="logo-title">تكة | Tikka 🛵</div>
             </div>
             <div class="user-panel">
@@ -151,7 +152,7 @@
                     <p style="margin-bottom: 10px;">رصيد النقاط: <strong id="accPoints" style="color:#d4af37;">0 نقطة</strong></p>
                 </div>
 
-                <!-- زر لوحة الأدمن الخاصة بسلومي (تظهر إذا كان المدير) -->
+                <!-- لوحة الأدمن الخاصة بسلومي (تظهر إذا كان المدير) -->
                 <div id="adminPanelWrapper" style="display:none; margin-top: 25px;">
                     <h3 style="color: #d4af37; margin-bottom: 12px; font-size: 16px;">⚙️ لوحة تحكم الأدمن (شاملة الفروع)</h3>
                     
@@ -166,7 +167,7 @@
                     <div id="secProducts" class="admin-panel-section active">
                         <h4 style="color:#d4af37; margin-bottom:10px;">➕ إضافة منتج جديد</h4>
                         <input type="text" id="pName" class="admin-input" placeholder="اسم المنتج">
-                        <input type="text" id="pPrice" class="admin-input" placeholder="السعر (مثلاً: 35 ريال)">
+                        <input type="text" id="pPrice" class="admin-input" placeholder="السعر (مثلاً: 35)">
                         <select id="pCategory" class="admin-input">
                             <option value="meals">وجبات ساخنة</option>
                             <option value="market">تكة ماركت</option>
@@ -200,7 +201,7 @@
 
         </div>
 
-        <!-- الشريط السفلي للتنقل (مطابق لهنقرستيشن) -->
+        <!-- الشريط السفلي للتنقل -->
         <div class="bottom-nav">
             <button class="nav-item active" onclick="switchNavTab('tabHome', this)">
                 <span class="icon">🏠</span> الرئيسية
@@ -255,7 +256,6 @@
             currentUser = name;
             currentPhone = phone;
 
-            // حفظ بيانات المستخدم في قاعدة البيانات لقائمتك بالأدمن
             try {
                 await setDoc(doc(db, "users", phone), {
                     name: name,
@@ -275,12 +275,11 @@
             document.getElementById('authScreen').classList.remove('active');
             document.getElementById('appScreen').classList.add('active');
 
-            // إذا كان المستخدم أنت (سلومي) أو رقمك، نظهر له لوحة الأدمن
-            if (currentUser === "سلومي" || currentPhone.includes("05")) {
+            // إظهار لوحة الأدمن إذا كان المستخدم "سلومي"
+            if (currentUser === "سلومي") {
                 document.getElementById('adminPanelWrapper').style.display = "block";
             }
 
-            // جلب نقاط المستخدم
             try {
                 let userDoc = await getDoc(doc(db, "users", currentPhone));
                 if (userDoc.exists()) {
@@ -296,7 +295,6 @@
             location.reload();
         }
 
-        // التنقل بين الشونق الأربع (الرئيسية، السجل، المكافآت، الحساب)
         window.switchNavTab = function(tabId, btn) {
             document.querySelectorAll('#appScreen > .container > .screen').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.bottom-nav .nav-item').forEach(b => b.classList.remove('active'));
@@ -312,7 +310,6 @@
             loadProductsUI();
         }
 
-        // فرعيات لوحة الأدمن
         window.switchAdminSub = function(secId, btn) {
             document.querySelectorAll('.admin-panel-section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.admin-sec-btn').forEach(b => b.classList.remove('active'));
@@ -320,7 +317,6 @@
             btn.classList.add('active');
         }
 
-        // جلب الموقع تلقائياً من الآيفون (GPS)
         function getUserLocation() {
             return new Promise((resolve) => {
                 if (navigator.geolocation) {
@@ -333,9 +329,8 @@
             });
         }
 
-        // طلب وجبة مع إمكانية استخدام نقاط المكافآت لخصم الفاتورة
         window.placeOrder = async function(itemName, priceStr) {
-            let numericPrice = parseFloat(priceStr) || 20;
+            let numericPrice = parseFloat(priceStr.replace(/[^0-9.]/g, '')) || 20;
             let usePoints = confirm("هل تريد استخدام نقاط المكافآت لخصم جزء من السعر؟");
             let discount = 0;
 
@@ -346,9 +341,10 @@
                     if (userSnap.exists()) {
                         let pts = userSnap.data().points || 0;
                         if (pts >= 10) {
-                            discount = Math.floor(pts / 10); // كل 10 نقاط بريال
+                            discount = Math.floor(pts / 10);
                             numericPrice = Math.max(0, numericPrice - discount);
-                            await updateDoc(userDocRef, { points: pts % 10 }); // خصم النقاط المستستخدمة
+                            let remainingPoints = pts % 10;
+                            await updateDoc(userDocRef, { points: remainingPoints });
                             alert(`تم خصم ${discount} ريال من قيمة الطلب مقابل نقاطك!`);
                         } else {
                             alert("نقاطك أقل من 10، لا يمكن الخصم حالياً.");
@@ -370,7 +366,6 @@
                     createdAt: serverTimestamp()
                 });
 
-                // إضافة 5 نقاط ولاء للعميل مع كل طلب جديد
                 let userRef = doc(db, "users", currentPhone);
                 let uSnap = await getDoc(userRef);
                 let curPts = (uSnap.exists() ? (uSnap.data().points || 0) : 0) + 5;
@@ -384,28 +379,27 @@
             }
         }
 
-        // الأدمن يضيف منتج
         window.addNewProduct = async function() {
-            let name = document.getElementById('pName').value;
-            let price = document.getElementById('pPrice').value;
+            let name = document.getElementById('pName').value.trim();
+            let price = document.getElementById('pPrice').value.trim();
             let category = document.getElementById('pCategory').value;
-            let img = document.getElementById('pImg').value || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c";
-            let desc = document.getElementById('pDesc').value;
+            let img = document.getElementById('pImg').value.trim() || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c";
+            let desc = document.getElementById('pDesc').value.trim();
 
             if(!name || !price) { alert("أدخل الاسم والسعر!"); return; }
             try {
-                await addDoc(collection(db, "products"), { name, price, category, img, desc });
+                await addDoc(collection(db, "products"), { name, price: price + " ريال", category, img, desc });
                 alert("تم إضافة المنتج بنجاح!");
                 document.getElementById('pName').value = "";
                 document.getElementById('pPrice').value = "";
+                document.getElementById('pImg').value = "";
                 document.getElementById('pDesc').value = "";
             } catch(e) { alert("فشل الإضافة."); }
         }
 
-        // الأدمن ينشر إعلان ورسالة للعملاء
         window.publishAnnouncement = async function() {
-            let title = document.getElementById('adTitleInput').value;
-            let desc = document.getElementById('adDescInput').value;
+            let title = document.getElementById('adTitleInput').value.trim();
+            let desc = document.getElementById('adDescInput').value.trim();
             if(!title) { alert("أدخل عنوان الإعلان!"); return; }
 
             try {
@@ -414,7 +408,6 @@
             } catch(e) { alert("فشل النشر."); }
         }
 
-        // الاستماع للإعلانات والرسائل الفورية من الأدمن
         onSnapshot(doc(db, "settings", "announcement"), (docSnap) => {
             if (docSnap.exists() && docSnap.data().active) {
                 let data = docSnap.data();
@@ -427,7 +420,6 @@
             }
         });
 
-        // جلب المنتجات حسب التبويب (وجبات أو ماركت)
         let allProductsCache = [];
         onSnapshot(collection(db, "products"), (snapshot) => {
             allProductsCache = [];
@@ -459,7 +451,6 @@
             document.getElementById('catalogGrid').innerHTML = gridHtml;
         }
 
-        // جلب السجل والطلبات والأدمن
         onSnapshot(collection(db, "orders"), (snapshot) => {
             let historyHtml = "";
             let adminOrdersHtml = "";
@@ -490,7 +481,6 @@
                     historyHtml += itemCard;
                 }
 
-                // لوحة الأدمن للطلبات
                 adminOrdersHtml += `
                     <div class="order-card">
                         <h4>${data.item} - ${data.price}</h4>
@@ -513,7 +503,6 @@
             document.getElementById('adminOrdersList').innerHTML = adminOrdersHtml;
         });
 
-        // جلب وعرض بيانات كل العملاء المسجلين في لوحة الأدمن
         onSnapshot(collection(db, "users"), (snapshot) => {
             let usersHtml = "";
             if (snapshot.empty) {
