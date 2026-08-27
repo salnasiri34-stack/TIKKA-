@@ -1,0 +1,15 @@
+{
+  "name": "اسم التطبيق الكامل",
+  "short_name": "التطبيق",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "images/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
