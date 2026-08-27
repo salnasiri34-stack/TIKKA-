@@ -1,0 +1,13 @@
+window.addEventListener('load', () => {
+    // التحقق إذا كان الجهاز آيفون وليس محمشاً داخل التطبيق مسبقاً
+    const isIos = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+    const isInStandaloneMode = ('standalone' in window.navigator) && (window.navigator.standalone);
+
+    if (isIos && !isInStandaloneMode) {
+        document.getElementById('add-to-home-banner').style.display = 'block';
+    }
+});
+
+function showInstallInstructions() {
+    alert("لإضافة التطبيق لشاشتك الرئيسية:\n1. اضغط على زر المشاركة (Share) في متصفح سفاري.\n2. اختر 'إضافة إلى الشاشة الرئيسية' (Add to Home Screen).");
+}
