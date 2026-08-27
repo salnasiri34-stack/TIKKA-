@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تطبيق تكا - لوحة الطلبات</title>
+    <style>
+        body {
+            font-family: Tahoma, sans-serif;
+            background-color: #f4f7f6;
+            text-align: center;
+            padding: 50px;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+            display: inline-block;
+        }
+        button {
+            background-color: #ff4757;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover {
+            background-color: #ff6b81;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>مطعم تكا - نظام الطلبات</h2>
+        <p>اضغط على الزر أدناه لإرسال طلب تجريبي مباشرة إلى قاعدة البيانات في Firebase:</p>
+        <button id="sendDataBtn">إرسال طلب جديد</button>
+    </div>
+
+    <!-- أكواد ربط Firebase الخاصة بمشروعك -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // إعدادات مشروعك الأساسية
+        const firebaseConfig = {
+            apiKey: "AIzaSyCbT5oJoSWA31DDkfuZ1pHmcjjUh_PiLmw",
+            authDomain: "tikka-0.firebaseapp.com",
+            projectId: "tikka-0",
+            storageBucket: "tikka-0.firebasestorage.app",
+            messagingSenderId: "821806366817",
+            appId: "1:821806366817:web:d4e36d26c3eb0d389caa20",
+            measurementId: "G-6BEGNPD4B6"
+        };
+
+        // تهيئة Firebase والخدمات
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getFirestore(app);
+
+        // إرسال البيانات لقاعدة البيانات عند الضغط على الزر
+        document.getElementById('sendDataBtn').addEventListener('click', async () => {
+            try {
+                await addDoc(collection(db, "orders"), {
+                    item: "وجبة تكا دجاج",
+                    status: "قيد الإعداد",
+                    createdAt: new Date()
+                });
+                alert("تم إرسال الطلب بنجاح إلى Firebase يا سلومي!");
+            } catch (e) {
+                console.error("خطأ أثناء الإرسال: ", e);
+                alert("صار فيه خطأ، تأكد من تفعيل Firestore Database من لوحة تحكم Firebase.");
+            }
+        });
+    </script>
+</body>
+</html>
