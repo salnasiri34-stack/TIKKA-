@@ -1,26 +1,27 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <link rel="apple-touch-icon" href="images/logo.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="images/logo-152.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="images/logo-180.png">
-    <link rel="apple-touch-icon" sizes="167x167" href="images/logo-167.png">
+    <!-- تعاريف الآيفون وتطبيق الويب الشامل -->
+    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/1-saloomy/tikka-assets/main/logo.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="https://raw.githubusercontent.com/1-saloomy/tikka-assets/main/logo.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/1-saloomy/tikka-assets/main/logo.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="https://raw.githubusercontent.com/1-saloomy/tikka-assets/main/logo.png">
 
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="تكة | Tikka">
+    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/1-saloomy/tikka-assets/main/logo.png">
 
-    <link rel="manifest" href="manifest.json">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تكة | Tikka - التطبيق الاحترافي المتكامل</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: Tahoma, sans-serif; }
-        body { background-color: #121212; color: #e0e0e0; padding-bottom: 70px; }
+        body { background-color: #121212; color: #e0e0e0; padding-bottom: 90px; }
 
         header { background-color: #1a1a1a; border-bottom: 2px solid #d4af37; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; }
         .logo-area { display: flex; align-items: center; gap: 12px; }
-        .logo-img { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #d4af37; object-fit: cover; }
+        .logo-img { width: 42px; height: 42px; border-radius: 50%; border: 2px solid #d4af37; object-fit: cover; }
         .logo-title { font-size: 20px; font-weight: bold; color: #d4af37; }
         
         .user-panel { display: flex; align-items: center; gap: 12px; }
@@ -31,6 +32,7 @@
         .screen.active { display: block; }
 
         .auth-box { background: #1e1e1e; border: 1px solid #333; max-width: 400px; margin: 60px auto; padding: 35px; border-radius: 16px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .auth-box img { width: 75px; height: 75px; border-radius: 50%; border: 2px solid #d4af37; margin-bottom: 15px; object-fit: cover; }
         .auth-box h2 { color: #d4af37; margin-bottom: 20px; }
         .auth-input { width: 100%; padding: 12px; margin-bottom: 15px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 8px; font-size: 15px; outline: none; }
         .auth-btn { width: 100%; background: #d4af37; color: #121212; border: none; padding: 12px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
@@ -57,6 +59,9 @@
         .price { font-weight: bold; color: #d4af37; font-size: 15px; display: block; margin-bottom: 8px; }
         .btn { width: 100%; background-color: #d4af37; color: #121212; border: none; padding: 8px; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
+        /* زر الأدمن بخط عريض وبارز داخل خانة الحساب */
+        .admin-trigger-btn { width: 100%; background: linear-gradient(135deg, #d4af37, #aa8c2c); color: #121212; border: none; padding: 15px; border-radius: 10px; font-size: 16px; font-weight: 900; cursor: pointer; text-align: center; margin-top: 15px; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3); }
+
         .admin-sections-nav { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
         .admin-sec-btn { background: #222; border: 1px solid #d4af37; color: #d4af37; padding: 8px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; white-space: nowrap; }
         .admin-sec-btn.active { background: #d4af37; color: #121212; font-weight: bold; }
@@ -66,23 +71,29 @@
 
         .order-card { background: #1a1a1a; border: 1px solid #333; padding: 15px; border-radius: 10px; margin-bottom: 12px; border-right: 5px solid #d4af37; font-size: 13px; }
         .status-badge { background: #332b00; color: #ffdf6d; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: bold; display: inline-block; }
+
+        footer { text-align: center; padding: 15px; font-size: 12px; color: #777; background: #151515; border-top: 1px solid #222; margin-top: 30px; }
     </style>
 </head>
 <body>
 
+    <!-- 1. شاشة الدخول -->
     <div id="authScreen" class="screen active">
         <div class="auth-box">
+            <img src="https://raw.githubusercontent.com/1-saloomy/tikka-assets/main/logo.png" onerror="this.style.display='none'">
             <h2>تكة | Tikka</h2>
-            <p style="color: #888; font-size: 13px; margin-bottom: 20px;">تسجيل الدخول لتجربة التوصيل الأذكى</p>
-            <input type="text" id="userName" class="auth-input" placeholder="اسمك الكريم (مثلاً: سلومي)">
+            <p style="color: #888; font-size: 13px; margin-bottom: 20px;">تطبيق التوصيل الذكي والمميز</p>
+            <input type="text" id="userName" class="auth-input" placeholder="اسمك الكريم">
             <input type="tel" id="userPhone" class="auth-input" placeholder="رقم الجوال">
             <button class="auth-btn" onclick="login()">دخول التطبيق</button>
         </div>
     </div>
 
+    <!-- 2. التطبيق الرئيسي -->
     <div id="appScreen" class="screen">
         <header>
             <div class="logo-area">
+                <img src="https://raw.githubusercontent.com/1-saloomy/tikka-assets/main/logo.png" class="logo-img" onerror="this.style.display='none'">
                 <div class="logo-title">تكة | Tikka 🛵</div>
             </div>
             <div class="user-panel">
@@ -94,9 +105,10 @@
         <div class="container">
             
             <div id="appMessageBox" style="display:none; background: #2c1a00; border: 1px solid #d4af37; padding: 12px; border-radius: 10px; margin-bottom: 15px; text-align: center;">
-                <span style="color: #d4af37; font-weight: bold; font-size: 13px;" id="adminMsgText">رسالة جديدة من إدارة تكة</span>
+                <span style="color: #d4af37; font-weight: bold; font-size: 13px;" id="adminMsgText">رسالة جديدة من الإدارة</span>
             </div>
 
+            <!-- الرئيسية -->
             <div id="tabHome" class="screen active">
                 <div id="activeAdsBanner" class="ads-banner" style="display:none;">
                     <h3 id="adTitleText">العرض الترويجي</h3>
@@ -111,20 +123,23 @@
                 <div id="catalogGrid" class="grid"><p style="color:#777;">جاري التحميل...</p></div>
             </div>
 
+            <!-- السجل -->
             <div id="tabHistory" class="screen">
-                <h2 style="margin-bottom: 15px; color: #fff; font-size: 18px;">سجل الطلبات السابقة وإثباتات التوصيل 📦</h2>
+                <h2 style="margin-bottom: 15px; color: #fff; font-size: 18px;">سجل طلباتك السابقة وإثباتات التوصيل 📦</h2>
                 <div id="historyContainer"><p style="color: #777;">لا توجد طلبات سابقة.</p></div>
             </div>
 
+            <!-- المكافآت -->
             <div id="tabRewards" class="screen">
                 <div style="background: linear-gradient(135deg, #1e1e1e, #2a2200); border: 1px solid #d4af37; padding: 25px; border-radius: 15px; text-align: center; margin-bottom: 20px;">
                     <h2 style="color: #d4af37; margin-bottom: 10px;">نظام نقاط ولاء تكة ⭐</h2>
-                    <p style="color: #bbb; font-size: 13px; margin-bottom: 15px;">كلما طلبت أكثر، جمعت نقاط أكثر تستخدمها لخصم قيمة طلباتك القادمة!</p>
+                    <p style="color: #bbb; font-size: 13px; margin-bottom: 15px;">اجمع النقاط مع كل طلب واستخدمها لخصم قيمة طلباتك القادمة!</p>
                     <div style="font-size: 30px; font-weight: bold; color: #d4af37;" id="myPointsDisplay">0 نقطة</div>
-                    <p style="font-size: 11px; color: #888; margin-top: 5px;">كل 10 نقاط تساوي خصم ريال واحد عند الدفع.</p>
+                    <p style="font-size: 11px; color: #888; margin-top: 5px;">كل 10 نقاط تساوي خصم ريال واحد.</p>
                 </div>
             </div>
 
+            <!-- الحساب ولوحة الأدمن المحمية بالرمز السري -->
             <div id="tabAccount" class="screen">
                 <div style="background: #1a1a1a; border: 1px solid #333; padding: 20px; border-radius: 12px;">
                     <h2 style="color: #d4af37; margin-bottom: 15px; font-size: 18px;">معلومات الحساب الشخصي 👤</h2>
@@ -133,15 +148,18 @@
                     <p style="margin-bottom: 10px;">رصيد النقاط: <strong id="accPoints" style="color:#d4af37;">0 نقطة</strong></p>
                 </div>
 
-                <!-- لوحة تحكم الأدمن الخاصة بك (تظهر فور دخولك باسم سلومي أو سلومي مع اختلاف الهمزات) -->
+                <!-- زر الأدمن بخط عريض ورمز سري -->
+                <button class="admin-trigger-btn" onclick="openAdminPanelWithPassword()">🔑 لوحة تحكم الأدمن (الرمز السري)</button>
+
+                <!-- لوحة التحكم الفعلية (مخفية لحين إدخال الرمز الصحيح) -->
                 <div id="adminPanelWrapper" style="display:none; margin-top: 25px;">
-                    <h3 style="color: #d4af37; margin-bottom: 12px; font-size: 16px;">⚙️ لوحة تحكم الأدمن (تحكم كامل)</h3>
+                    <h3 style="color: #d4af37; margin-bottom: 12px; font-size: 18px; font-weight: 900;">⚙️ لوحة تحكم الأدمن (تحكم كامل 1000+)</h3>
                     
                     <div class="admin-sections-nav">
                         <button class="admin-sec-btn active" onclick="switchAdminSub('secProducts', this)">إضافة وجبات/ماركت</button>
-                        <button class="admin-sec-btn" onclick="switchAdminSub('secOrders', this)">متابعة وإتمام الطلبات</button>
-                        <button class="admin-sec-btn" onclick="switchAdminSub('secUsers', this)">إدارة العملاء والنقاط</button>
-                        <button class="admin-sec-btn" onclick="switchAdminSub('secAds', this)">إدارة الإعلانات والرسائل</button>
+                        <button class="admin-sec-btn" onclick="switchAdminSub('secOrders', this)">متابعة الطلبات</button>
+                        <button class="admin-sec-btn" onclick="switchAdminSub('secUsers', this)">إدارة العملاء والمسجلين</button>
+                        <button class="admin-sec-btn" onclick="switchAdminSub('secAds', this)">الإعلانات والرسائل</button>
                     </div>
 
                     <div id="secProducts" class="admin-panel-section active">
@@ -158,26 +176,32 @@
                     </div>
 
                     <div id="secOrders" class="admin-panel-section">
-                        <h4 style="color:#d4af37; margin-bottom:10px;">📦 طلبات العملاء الحية</h4>
+                        <h4 style="color:#d4af37; margin-bottom:10px;">📦 طلبات جميع العملاء الحية</h4>
                         <div id="adminOrdersList"><p style="color:#777;">جاري التحميل...</p></div>
                     </div>
 
                     <div id="secUsers" class="admin-panel-section">
-                        <h4 style="color:#d4af37; margin-bottom:10px;">👥 إدارة حسابات العملاء ونقاط الولاء</h4>
+                        <h4 style="color:#d4af37; margin-bottom:10px;">👥 قائمة كل من سجل في التطبيق والنقاط</h4>
                         <div id="adminUsersList"><p style="color:#777;">جاري التحميل...</p></div>
                     </div>
 
                     <div id="secAds" class="admin-panel-section">
-                        <h4 style="color:#d4af37; margin-bottom:10px;">📢 إرسال إعلان أو رسالة فورية للعملاء</h4>
-                        <input type="text" id="adTitleInput" class="admin-input" placeholder="عنوان الإعلان (مثلاً: خصم 50% اليوم)">
-                        <input type="text" id="adDescInput" class="admin-input" placeholder="تفاصيل الإعلان أو الرسالة">
-                        <button class="btn" onclick="publishAnnouncement()">نشر الإعلان والرسالة فوراً</button>
+                        <h4 style="color:#d4af37; margin-bottom:10px;">📢 إرسال إعلان أو رسالة فورية</h4>
+                        <input type="text" id="adTitleInput" class="admin-input" placeholder="عنوان الإعلان">
+                        <input type="text" id="adDescInput" class="admin-input" placeholder="تفاصيل الإعلان">
+                        <button class="btn" onclick="publishAnnouncement()">نشر الإعلان للجميع</button>
                     </div>
                 </div>
             </div>
 
         </div>
 
+        <!-- حقوق النشر في أسفل الصفحة باسمك الرسمي فقط -->
+        <footer>
+            <p>&copy; 2026 جميع الحقوق محفوظة لصالح سليمان. التطبيق الرسمي.</p>
+        </footer>
+
+        <!-- شريط التنقل السفلي -->
         <div class="bottom-nav">
             <button class="nav-item active" onclick="switchNavTab('tabHome', this)">
                 <span class="icon">🏠</span> الرئيسية
@@ -194,6 +218,7 @@
         </div>
     </div>
 
+    <!-- Firebase والمنطق البرمجي -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, updateDoc, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -226,6 +251,10 @@
                 alert("الرجاء إدخال الاسم ورقم الجوال!");
                 return;
             }
+
+            // طلب صلاحيات الإشعارات والموقع فوراً للآيفون والأجهزة الذكية
+            requestDevicePermissions();
+
             localStorage.setItem('tikka_user', name);
             localStorage.setItem('tikka_phone', phone);
             currentUser = name;
@@ -243,18 +272,29 @@
             initAppSession();
         }
 
+        function requestDevicePermissions() {
+            if (window.Notification && Notification.permission !== "granted") {
+                Notification.requestPermission().then(permission => {
+                    if (permission === "granted") {
+                        console.log("تم السماح بالإشعارات بنجاح");
+                    }
+                });
+            }
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => console.log("تم الحصول على الموقع بنجاح"),
+                    (err) => console.log("تم رفض الموقع أو غير متوفر"),
+                    { timeout: 5000 }
+                );
+            }
+        }
+
         async function initAppSession() {
             document.getElementById('welcomeUser').innerText = "مرحباً، " + currentUser;
             document.getElementById('accName').innerText = currentUser;
             document.getElementById('accPhone').innerText = currentPhone;
             document.getElementById('authScreen').classList.remove('active');
             document.getElementById('appScreen').classList.add('active');
-
-            // إظهار لوحة الأدمن تلقائياً لك إذا كان الاسم "سلومي" أو "Saloumi" أو "Sulaiman"
-            let trimmedName = currentUser.trim();
-            if (trimmedName === "سلومي" || trimmedName === "سلومي " || trimmedName.toLowerCase() === "saloumi" || trimmedName.toLowerCase() === "sulaiman") {
-                document.getElementById('adminPanelWrapper').style.display = "block";
-            }
 
             try {
                 let userDoc = await getDoc(doc(db, "users", currentPhone));
@@ -264,6 +304,17 @@
                     document.getElementById('accPoints').innerText = pts + " نقطة";
                 }
             } catch(e) {}
+        }
+
+        // دالة الرمز السري للوحة الأدمن داخل خانة الحساب (الرمز الافتراضي: 1234)
+        window.openAdminPanelWithPassword = function() {
+            let pass = prompt("أدخل الرمز السري الخاص بلوحة الأدمن:");
+            if (pass === "1234") {
+                document.getElementById('adminPanelWrapper').style.display = "block";
+                alert("تم التحقق بنجاح! أهلاً بك في لوحة تحكم الأدمن.");
+            } else if (pass !== null) {
+                alert("الرمز السري غير صحيح!");
+            }
         }
 
         window.logout = function() {
@@ -321,9 +372,9 @@
                             numericPrice = Math.max(0, numericPrice - discount);
                             let remainingPoints = pts % 10;
                             await updateDoc(userDocRef, { points: remainingPoints });
-                            alert(`تم خصم ${discount} ريال من قيمة الطلب مقابل نقاطك!`);
+                            alert(`تم خصم ${discount} ريال مقابل نقاطك!`);
                         } else {
-                            alert("نقاطك أقل من 10، لا يمكن الخصم حالياً.");
+                            alert("نقاطك أقل من 10.");
                         }
                     }
                 } catch(e) {}
@@ -380,7 +431,7 @@
 
             try {
                 await setDoc(doc(db, "settings", "announcement"), { title, desc, active: true });
-                alert("تم نشر الإعلان والرسالة الفورية لجميع العملاء بنجاح!");
+                alert("تم نشر الإعلان والرسالة الفورية للجميع بنجاح!");
             } catch(e) { alert("فشل النشر."); }
         }
 
@@ -482,7 +533,7 @@
         onSnapshot(collection(db, "users"), (snapshot) => {
             let usersHtml = "";
             if (snapshot.empty) {
-                document.getElementById('adminUsersList').innerHTML = "<p style='color:#777;'>لا توجد حسابات مسجلة.</p>";
+                document.getElementById('adminUsersList').innerHTML = "<p style='color:#777;'>لا توجد حسابات مسجلة حتى الآن.</p>";
                 return;
             }
             snapshot.forEach((docSnap) => {
@@ -507,7 +558,7 @@
                 let currentPts = uSnap.exists() ? (uSnap.data().points || 0) : 0;
                 let newTotal = currentPts + parseInt(ptsToAdd);
                 await setDoc(userRef, { points: newTotal }, { merge: true });
-                alert("تم تحديث وإضافة النقاط للعميل بنجاح!");
+                alert("تم تحديث النقاط للعميل بنجاح!");
             } catch(e) { alert("خطأ في التحديث."); }
         }
 
