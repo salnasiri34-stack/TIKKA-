@@ -1,18 +1,15 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <!-- أيقونة التطبيق الخاصة بأجهزة أبل (iOS Touch Icon) -->
     <link rel="apple-touch-icon" href="images/logo.png">
     <link rel="apple-touch-icon" sizes="152x152" href="images/logo-152.png">
     <link rel="apple-touch-icon" sizes="180x180" href="images/logo-180.png">
     <link rel="apple-touch-icon" sizes="167x167" href="images/logo-167.png">
 
-    <!-- تفعيل وضع تطبيق الويب على آبل (إخفاء شريط المتصفح) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="تكة | Tikka">
 
-    <!-- ربط ملف الـ Manifest العام -->
     <link rel="manifest" href="manifest.json">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,7 +18,6 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: Tahoma, sans-serif; }
         body { background-color: #121212; color: #e0e0e0; padding-bottom: 70px; }
 
-        /* الهيدر الفخم */
         header { background-color: #1a1a1a; border-bottom: 2px solid #d4af37; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; }
         .logo-area { display: flex; align-items: center; gap: 12px; }
         .logo-img { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #d4af37; object-fit: cover; }
@@ -34,29 +30,24 @@
         .screen { display: none; }
         .screen.active { display: block; }
 
-        /* شاشة الدخول */
         .auth-box { background: #1e1e1e; border: 1px solid #333; max-width: 400px; margin: 60px auto; padding: 35px; border-radius: 16px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .auth-box h2 { color: #d4af37; margin-bottom: 20px; }
         .auth-input { width: 100%; padding: 12px; margin-bottom: 15px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 8px; font-size: 15px; outline: none; }
         .auth-btn { width: 100%; background: #d4af37; color: #121212; border: none; padding: 12px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
 
-        /* الشريط السفلي مثل هنقرستيشن */
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #181818; border-top: 1px solid #333; display: flex; justify-content: space-around; padding: 10px 0; z-index: 1000; }
         .nav-item { background: none; border: none; color: #888; font-size: 12px; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
         .nav-item.active { color: #d4af37; font-weight: bold; }
         .nav-item span.icon { font-size: 20px; }
 
-        /* شريط الإعلانات العلوية المتحركة */
         .ads-banner { background: linear-gradient(135deg, #2b2300, #1a1a1a); border: 1px solid #d4af37; padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: center; }
         .ads-banner h3 { color: #d4af37; margin-bottom: 5px; font-size: 16px; }
         .ads-banner p { font-size: 13px; color: #ccc; }
 
-        /* الأقسام الداخلية في الرئيسية */
         .sub-tabs { display: flex; gap: 10px; margin-bottom: 15px; }
         .sub-tab-btn { background: #222; border: 1px solid #444; color: #aaa; padding: 8px 18px; border-radius: 20px; font-size: 13px; cursor: pointer; }
         .sub-tab-btn.active { background: #d4af37; color: #121212; border-color: #d4af37; font-weight: bold; }
 
-        /* شبكة المنتجات */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
         .card { background: #1a1a1a; border: 1px solid #333; border-radius: 12px; overflow: hidden; }
         .card img { width: 100%; height: 140px; object-fit: cover; background: #252525; }
@@ -66,7 +57,6 @@
         .price { font-weight: bold; color: #d4af37; font-size: 15px; display: block; margin-bottom: 8px; }
         .btn { width: 100%; background-color: #d4af37; color: #121212; border: none; padding: 8px; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
-        /* لوحة الأدمن المقسمة لفرعيات */
         .admin-sections-nav { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
         .admin-sec-btn { background: #222; border: 1px solid #d4af37; color: #d4af37; padding: 8px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; white-space: nowrap; }
         .admin-sec-btn.active { background: #d4af37; color: #121212; font-weight: bold; }
@@ -80,10 +70,8 @@
 </head>
 <body>
 
-    <!-- 1. شاشة الدخول -->
     <div id="authScreen" class="screen active">
         <div class="auth-box">
-            <img src="https://raw.githubusercontent.com/1-saloomy/tikka-assets/main/logo.png" style="width:70px; height:70px; border-radius:50%; border:2px solid #d4af37; margin-bottom:15px; object-fit:cover;" onerror="this.style.display='none'">
             <h2>تكة | Tikka</h2>
             <p style="color: #888; font-size: 13px; margin-bottom: 20px;">تسجيل الدخول لتجربة التوصيل الأذكى</p>
             <input type="text" id="userName" class="auth-input" placeholder="اسمك الكريم (مثلاً: سلومي)">
@@ -92,11 +80,9 @@
         </div>
     </div>
 
-    <!-- 2. التطبيق الرئيسي والشاشات الأربع -->
     <div id="appScreen" class="screen">
         <header>
             <div class="logo-area">
-                <img src="https://raw.githubusercontent.com/1-saloomy/tikka-assets/main/logo.png" class="logo-img" onerror="this.style.display='none'">
                 <div class="logo-title">تكة | Tikka 🛵</div>
             </div>
             <div class="user-panel">
@@ -107,12 +93,10 @@
 
         <div class="container">
             
-            <!-- إشعار أو رسالة تسويقية تظهر من الأدمن -->
             <div id="appMessageBox" style="display:none; background: #2c1a00; border: 1px solid #d4af37; padding: 12px; border-radius: 10px; margin-bottom: 15px; text-align: center;">
                 <span style="color: #d4af37; font-weight: bold; font-size: 13px;" id="adminMsgText">رسالة جديدة من إدارة تكة</span>
             </div>
 
-            <!-- الخانة الأولى: الرئيسية (مع الإعلان المتحرك والتصنيفات) -->
             <div id="tabHome" class="screen active">
                 <div id="activeAdsBanner" class="ads-banner" style="display:none;">
                     <h3 id="adTitleText">العرض الترويجي</h3>
@@ -127,13 +111,11 @@
                 <div id="catalogGrid" class="grid"><p style="color:#777;">جاري التحميل...</p></div>
             </div>
 
-            <!-- الخانة الثانية: السجل -->
             <div id="tabHistory" class="screen">
                 <h2 style="margin-bottom: 15px; color: #fff; font-size: 18px;">سجل الطلبات السابقة وإثباتات التوصيل 📦</h2>
                 <div id="historyContainer"><p style="color: #777;">لا توجد طلبات سابقة.</p></div>
             </div>
 
-            <!-- الخانة الثالثة: المكافآت (نقاط الولاء) -->
             <div id="tabRewards" class="screen">
                 <div style="background: linear-gradient(135deg, #1e1e1e, #2a2200); border: 1px solid #d4af37; padding: 25px; border-radius: 15px; text-align: center; margin-bottom: 20px;">
                     <h2 style="color: #d4af37; margin-bottom: 10px;">نظام نقاط ولاء تكة ⭐</h2>
@@ -143,7 +125,6 @@
                 </div>
             </div>
 
-            <!-- الخانة الرابعة: الحساب -->
             <div id="tabAccount" class="screen">
                 <div style="background: #1a1a1a; border: 1px solid #333; padding: 20px; border-radius: 12px;">
                     <h2 style="color: #d4af37; margin-bottom: 15px; font-size: 18px;">معلومات الحساب الشخصي 👤</h2>
@@ -152,9 +133,9 @@
                     <p style="margin-bottom: 10px;">رصيد النقاط: <strong id="accPoints" style="color:#d4af37;">0 نقطة</strong></p>
                 </div>
 
-                <!-- لوحة الأدمن الخاصة بسلومي (تظهر إذا كان المدير) -->
+                <!-- لوحة تحكم الأدمن الخاصة بك (تظهر فور دخولك باسم سلومي أو سلومي مع اختلاف الهمزات) -->
                 <div id="adminPanelWrapper" style="display:none; margin-top: 25px;">
-                    <h3 style="color: #d4af37; margin-bottom: 12px; font-size: 16px;">⚙️ لوحة تحكم الأدمن (شاملة الفروع)</h3>
+                    <h3 style="color: #d4af37; margin-bottom: 12px; font-size: 16px;">⚙️ لوحة تحكم الأدمن (تحكم كامل)</h3>
                     
                     <div class="admin-sections-nav">
                         <button class="admin-sec-btn active" onclick="switchAdminSub('secProducts', this)">إضافة وجبات/ماركت</button>
@@ -163,7 +144,6 @@
                         <button class="admin-sec-btn" onclick="switchAdminSub('secAds', this)">إدارة الإعلانات والرسائل</button>
                     </div>
 
-                    <!-- فرع 1: المنتجات -->
                     <div id="secProducts" class="admin-panel-section active">
                         <h4 style="color:#d4af37; margin-bottom:10px;">➕ إضافة منتج جديد</h4>
                         <input type="text" id="pName" class="admin-input" placeholder="اسم المنتج">
@@ -177,19 +157,16 @@
                         <button class="btn" onclick="addNewProduct()">إضافة للقائمة</button>
                     </div>
 
-                    <!-- فرع 2: الطلبات وإثبات التوصيل -->
                     <div id="secOrders" class="admin-panel-section">
                         <h4 style="color:#d4af37; margin-bottom:10px;">📦 طلبات العملاء الحية</h4>
                         <div id="adminOrdersList"><p style="color:#777;">جاري التحميل...</p></div>
                     </div>
 
-                    <!-- فرع 3: إدارة العملاء والنقاط -->
                     <div id="secUsers" class="admin-panel-section">
                         <h4 style="color:#d4af37; margin-bottom:10px;">👥 إدارة حسابات العملاء ونقاط الولاء</h4>
                         <div id="adminUsersList"><p style="color:#777;">جاري التحميل...</p></div>
                     </div>
 
-                    <!-- فرع 4: الإعلانات والرسائل -->
                     <div id="secAds" class="admin-panel-section">
                         <h4 style="color:#d4af37; margin-bottom:10px;">📢 إرسال إعلان أو رسالة فورية للعملاء</h4>
                         <input type="text" id="adTitleInput" class="admin-input" placeholder="عنوان الإعلان (مثلاً: خصم 50% اليوم)">
@@ -201,7 +178,6 @@
 
         </div>
 
-        <!-- الشريط السفلي للتنقل -->
         <div class="bottom-nav">
             <button class="nav-item active" onclick="switchNavTab('tabHome', this)">
                 <span class="icon">🏠</span> الرئيسية
@@ -218,7 +194,6 @@
         </div>
     </div>
 
-    <!-- Firebase SDK والمنطق البرمجي -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, updateDoc, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -275,8 +250,9 @@
             document.getElementById('authScreen').classList.remove('active');
             document.getElementById('appScreen').classList.add('active');
 
-            // إظهار لوحة الأدمن إذا كان المستخدم "سلومي"
-            if (currentUser === "سلومي") {
+            // إظهار لوحة الأدمن تلقائياً لك إذا كان الاسم "سلومي" أو "Saloumi" أو "Sulaiman"
+            let trimmedName = currentUser.trim();
+            if (trimmedName === "سلومي" || trimmedName === "سلومي " || trimmedName.toLowerCase() === "saloumi" || trimmedName.toLowerCase() === "sulaiman") {
                 document.getElementById('adminPanelWrapper').style.display = "block";
             }
 
