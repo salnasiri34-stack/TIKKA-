@@ -3,133 +3,212 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تكة | Tikka - توصيل الطعام السريع</title>
+    <title>تكة | Tikka - التطبيق الاحترافي المتكامل</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: Tahoma, sans-serif; }
-        body { background-color: #f7f9fa; color: #333; }
+        body { background-color: #121212; color: #e0e0e0; padding-bottom: 70px; }
+
+        /* الهيدر الفخم */
+        header { background-color: #1a1a1a; border-bottom: 2px solid #d4af37; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; }
+        .logo-area { display: flex; align-items: center; gap: 12px; }
+        .logo-img { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #d4af37; object-fit: cover; }
+        .logo-title { font-size: 20px; font-weight: bold; color: #d4af37; }
         
-        /* الهيدر */
-        header { background-color: #d70f64; color: white; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .logo { font-size: 24px; font-weight: bold; display: flex; align-items: center; gap: 8px; }
-        .user-info { display: flex; align-items: center; gap: 15px; }
-        .logout-btn { background: rgba(255,255,255,0.2); border: none; color: white; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; }
-        
-        /* التبويبات والشاشات */
-        .container { max-width: 950px; margin: 25px auto; padding: 0 15px; }
+        .user-panel { display: flex; align-items: center; gap: 12px; }
+        .logout-btn { background: #333; border: 1px solid #d4af37; color: #d4af37; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+
+        .container { max-width: 1000px; margin: 20px auto; padding: 0 15px; }
         .screen { display: none; }
         .screen.active { display: block; }
 
-        /* شاشة تسجيل الدخول */
-        .auth-card { background: white; max-width: 400px; margin: 50px auto; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); text-align: center; }
-        .auth-card h2 { color: #d70f64; margin-bottom: 20px; }
-        .auth-input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; outline: none; }
-        .auth-btn { width: 100%; background: #d70f64; color: white; border: none; padding: 12px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
-        .auth-btn:hover { background: #b50b52; }
+        /* شاشة الدخول */
+        .auth-box { background: #1e1e1e; border: 1px solid #333; max-width: 400px; margin: 60px auto; padding: 35px; border-radius: 16px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .auth-box h2 { color: #d4af37; margin-bottom: 20px; }
+        .auth-input { width: 100%; padding: 12px; margin-bottom: 15px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 8px; font-size: 15px; outline: none; }
+        .auth-btn { width: 100%; background: #d4af37; color: #121212; border: none; padding: 12px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
 
-        /* البطاقات والمطاعم */
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
-        .card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); transition: 0.2s; }
-        .card:hover { transform: translateY(-3px); }
-        .card-img { height: 140px; background: #ffebee; display: flex; align-items: center; justify-content: center; font-size: 40px; }
-        .card-body { padding: 15px; }
-        .card-title { font-size: 18px; font-weight: bold; margin-bottom: 5px; }
-        .card-desc { font-size: 13px; color: #666; margin-bottom: 12px; }
-        .price { font-weight: bold; color: #d70f64; font-size: 16px; margin-bottom: 10px; display: block; }
-        .btn { width: 100%; background-color: #d70f64; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .btn:hover { background-color: #b50b52; }
+        /* الشريط السفلي مثل هنقرستيشن */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #181818; border-top: 1px solid #333; display: flex; justify-content: space-around; padding: 10px 0; z-index: 1000; }
+        .nav-item { background: none; border: none; color: #888; font-size: 12px; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
+        .nav-item.active { color: #d4af37; font-weight: bold; }
+        .nav-item span.icon { font-size: 20px; }
 
-        /* شريط التنقل السفلي أو العلوي للعميل/الأدمن */
-        .nav-bar { display: flex; gap: 10px; margin-bottom: 20px; }
-        .nav-tab-btn { background: #e0e0e0; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .nav-tab-btn.active { background: #d70f64; color: white; }
+        /* شريط الإعلانات العلوية المتحركة */
+        .ads-banner { background: linear-gradient(135deg, #2b2300, #1a1a1a); border: 1px solid #d4af37; padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: center; }
+        .ads-banner h3 { color: #d4af37; margin-bottom: 5px; font-size: 16px; }
+        .ads-banner p { font-size: 13px; color: #ccc; }
 
-        /* لوحة الطلبات */
-        .order-box { background: white; padding: 15px 20px; border-radius: 10px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 4px rgba(0,0,0,0.05); border-right: 5px solid #d70f64; }
-        .order-info h4 { font-size: 16px; color: #222; margin-bottom: 4px; }
-        .order-info p { font-size: 13px; color: #777; }
-        .status-badge { background: #fff3cd; color: #856404; padding: 5px 12px; border-radius: 15px; font-size: 12px; font-weight: bold; }
-        .admin-actions button { padding: 6px 12px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-right: 5px; }
-        .accept-btn { background: #28a745; color: white; }
-        .complete-btn { background: #007bff; color: white; }
+        /* الأقسام الداخلية في الرئيسية */
+        .sub-tabs { display: flex; gap: 10px; margin-bottom: 15px; }
+        .sub-tab-btn { background: #222; border: 1px solid #444; color: #aaa; padding: 8px 18px; border-radius: 20px; font-size: 13px; cursor: pointer; }
+        .sub-tab-btn.active { background: #d4af37; color: #121212; border-color: #d4af37; font-weight: bold; }
+
+        /* شبكة المنتجات */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
+        .card { background: #1a1a1a; border: 1px solid #333; border-radius: 12px; overflow: hidden; }
+        .card img { width: 100%; height: 140px; object-fit: cover; background: #252525; }
+        .card-body { padding: 12px; }
+        .card-title { font-size: 16px; font-weight: bold; color: #fff; margin-bottom: 4px; }
+        .card-desc { font-size: 12px; color: #999; margin-bottom: 8px; }
+        .price { font-weight: bold; color: #d4af37; font-size: 15px; display: block; margin-bottom: 8px; }
+        .btn { width: 100%; background-color: #d4af37; color: #121212; border: none; padding: 8px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+
+        /* لوحة الأدمن المقسمة لفرعيات */
+        .admin-sections-nav { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
+        .admin-sec-btn { background: #222; border: 1px solid #d4af37; color: #d4af37; padding: 8px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; white-space: nowrap; }
+        .admin-sec-btn.active { background: #d4af37; color: #121212; font-weight: bold; }
+        .admin-panel-section { display: none; background: #1a1a1a; border: 1px solid #333; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
+        .admin-panel-section.active { display: block; }
+        .admin-input { width: 100%; padding: 10px; background: #252525; border: 1px solid #444; color: white; border-radius: 6px; margin-bottom: 10px; font-size: 13px; }
+
+        .order-card { background: #1a1a1a; border: 1px solid #333; padding: 15px; border-radius: 10px; margin-bottom: 12px; border-right: 5px solid #d4af37; font-size: 13px; }
+        .status-badge { background: #332b00; color: #ffdf6d; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: bold; display: inline-block; }
     </style>
 </head>
 <body>
 
-    <!-- 1. شاشة تسجيل الدخول -->
+    <!-- 1. شاشة الدخول -->
     <div id="authScreen" class="screen active">
-        <div class="auth-card">
-            <h2>تسجيل الدخول إلى تكة 🛵</h2>
-            <p style="color: #666; font-size: 13px; margin-bottom: 20px;">أدخل اسمك ورقم جوالك للبدء في طلب وجباتك المفضلة</p>
+        <div class="auth-box">
+            <img src="https://raw.githubusercontent.com/1-saloomy/tikka-assets/main/logo.png" style="width:70px; height:70px; border-radius:50%; border:2px solid #d4af37; margin-bottom:15px; object-fit:cover;" onerror="this.src=''">
+            <h2>تكة | Tikka</h2>
+            <p style="color: #888; font-size: 13px; margin-bottom: 20px;">تسجيل الدخول لتجربة التوصيل الأذكى</p>
             <input type="text" id="userName" class="auth-input" placeholder="اسمك الكريم (مثلاً: سلومي)">
             <input type="text" id="userPhone" class="auth-input" placeholder="رقم الجوال">
             <button class="auth-btn" onclick="login()">دخول التطبيق</button>
         </div>
     </div>
 
-    <!-- 2. الشاشة الرئيسية للتطبيق (بعد الدخول) -->
+    <!-- 2. التطبيق الرئيسي والشاشات الأربع -->
     <div id="appScreen" class="screen">
         <header>
-            <div class="logo">تكة | Tikka 🛵</div>
-            <div class="user-info">
-                <span id="welcomeUser" style="font-weight: bold;">أهلاً بك</span>
+            <div class="logo-area">
+                <img src="https://raw.githubusercontent.com/1-saloomy/tikka-assets/main/logo.png" class="logo-img" onerror="this.src=''">
+                <div class="logo-title">تكة | Tikka 🛵</div>
+            </div>
+            <div class="user-panel">
+                <span id="welcomeUser" style="font-weight: bold; color: #d4af37; font-size: 13px;"></span>
                 <button class="logout-btn" onclick="logout()">خروج</button>
             </div>
         </header>
 
         <div class="container">
-            <div class="nav-bar">
-                <button class="nav-tab-btn active" onclick="switchMainTab('menu', this)">قائمة الطعام</button>
-                <button class="nav-tab-btn" onclick="switchMainTab('orders', this)">طلباتي / لوحة التحكم</button>
+            
+            <!-- إشعار أو رسالة تسويقية تظهر من الأدمن -->
+            <div id="appMessageBox" style="display:none; background: #2c1a00; border: 1px solid #d4af37; padding: 12px; border-radius: 10px; margin-bottom: 15px; text-align: center;">
+                <span style="color: #d4af37; font-weight: bold; font-size: 13px;" id="adminMsgText">رسالة جديدة من إدارة تكة</span>
             </div>
 
-            <!-- قائمة الطعام -->
-            <div id="menuTab" class="screen active">
-                <h2 style="margin-bottom: 15px; color: #444;">المنيو والوجبات المتاحة</h2>
-                <div class="grid">
-                    <div class="card">
-                        <div class="card-img">🍗</div>
-                        <div class="card-body">
-                            <div class="card-title">وجبة تكا دجاج ملكي</div>
-                            <div class="card-desc">دجاج مشوي عالفحم مع صوص الثوم والبطاطس المقرمشة</div>
-                            <span class="price">35 ريال</span>
-                            <button class="btn" onclick="placeOrder('وجبة تكا دجاج ملكي', 35)">اطلب الآن</button>
-                        </div>
+            <!-- الخانة الأولى: الرئيسية (مع الإعلان المتحرك والتصنيفات) -->
+            <div id="tabHome" class="screen active">
+                <div id="activeAdsBanner" class="ads-banner" style="display:none;">
+                    <h3 id="adTitleText">العرض الترويجي</h3>
+                    <p id="adDescText">تفاصيل العرض هنا...</p>
+                </div>
+
+                <div class="sub-tabs">
+                    <button class="sub-tab-btn active" onclick="switchCategory('meals', this)">🍔 الوجبات الساخنة</button>
+                    <button class="sub-tab-btn" onclick="switchCategory('market', this)">🛒 تكة ماركت</button>
+                </div>
+
+                <div id="catalogGrid" class="grid"><p style="color:#777;">جاري التحميل...</p></div>
+            </div>
+
+            <!-- الخانة الثانية: السجل -->
+            <div id="tabHistory" class="screen">
+                <h2 style="margin-bottom: 15px; color: #fff; font-size: 18px;">سجل الطلبات السابقة وإثباتات التوصيل 📦</h2>
+                <div id="historyContainer"><p style="color: #777;">لا توجد طلبات سابقة.</p></div>
+            </div>
+
+            <!-- الخانة الثالثة: المكافآت (نقاط الولاء) -->
+            <div id="tabRewards" class="screen">
+                <div style="background: linear-gradient(135deg, #1e1e1e, #2a2200); border: 1px solid #d4af37; padding: 25px; border-radius: 15px; text-align: center; margin-bottom: 20px;">
+                    <h2 style="color: #d4af37; margin-bottom: 10px;">نظام نقاط ولاء تكة ⭐</h2>
+                    <p style="color: #bbb; font-size: 13px; margin-bottom: 15px;">كلما طلبت أكثر، جمعت نقاط أكثر تستخدمها لخصم قيمة طلباتك القادمة!</p>
+                    <div style="font-size: 30px; font-weight: bold; color: #d4af37;" id="myPointsDisplay">0 نقطة</div>
+                    <p style="font-size: 11px; color: #888; margin-top: 5px;">كل 10 نقاط تساوي خصم ريال واحد عند الدفع.</p>
+                </div>
+            </div>
+
+            <!-- الخانة الرابعة: الحساب -->
+            <div id="tabAccount" class="screen">
+                <div style="background: #1a1a1a; border: 1px solid #333; padding: 20px; border-radius: 12px;">
+                    <h2 style="color: #d4af37; margin-bottom: 15px; font-size: 18px;">معلومات الحساب الشخصي 👤</h2>
+                    <p style="margin-bottom: 10px;">الاسم: <strong id="accName" style="color:#fff;">-</strong></p>
+                    <p style="margin-bottom: 10px;">رقم الجوال: <strong id="accPhone" style="color:#fff;">-</strong></p>
+                    <p style="margin-bottom: 10px;">رصيد النقاط: <strong id="accPoints" style="color:#d4af37;">0 نقطة</strong></p>
+                </div>
+
+                <!-- زر لوحة الأدمن الخاصة بسلومي (تظهر إذا كان المدير) -->
+                <div id="adminPanelWrapper" style="display:none; margin-top: 25px;">
+                    <h3 style="color: #d4af37; margin-bottom: 12px; font-size: 16px;">⚙️ لوحة تحكم الأدمن (شاملة الفروع)</h3>
+                    
+                    <div class="admin-sections-nav">
+                        <button class="admin-sec-btn active" onclick="switchAdminSub('secProducts', this)">إضافة وجبات/ماركت</button>
+                        <button class="admin-sec-btn" onclick="switchAdminSub('secOrders', this)">متابعة وإتمام الطلبات</button>
+                        <button class="admin-sec-btn" onclick="switchAdminSub('secUsers', this)">إدارة العملاء والنقاط</button>
+                        <button class="admin-sec-btn" onclick="switchAdminSub('secAds', this)">إدارة الإعلانات والرسائل</button>
                     </div>
-                    <div class="card">
-                        <div class="card-img">🌯</div>
-                        <div class="card-body">
-                            <div class="card-title">ساندوتش تكا صاروخ</div>
-                            <div class="card-desc">خبز صاج حار بحشوة الدجاج المميزة والصوص الخاص</div>
-                            <span class="price">18 ريال</span>
-                            <button class="btn" onclick="placeOrder('ساندوتش تكا صاروخ', 18)">اطلب الآن</button>
-                        </div>
+
+                    <!-- فرع 1: المنتجات -->
+                    <div id="secProducts" class="admin-panel-section active">
+                        <h4 style="color:#d4af37; margin-bottom:10px;">➕ إضافة منتج جديد</h4>
+                        <input type="text" id="pName" class="admin-input" placeholder="اسم المنتج">
+                        <input type="text" id="pPrice" class="admin-input" placeholder="السعر (مثلاً: 35 ريال)">
+                        <select id="pCategory" class="admin-input">
+                            <option value="meals">وجبات ساخنة</option>
+                            <option value="market">تكة ماركت</option>
+                        </select>
+                        <input type="text" id="pImg" class="admin-input" placeholder="رابط صورة المنتج (Image URL)">
+                        <textarea id="pDesc" class="admin-input" placeholder="وصف المنتج..." style="height:50px;"></textarea>
+                        <button class="btn" onclick="addNewProduct()">إضافة للقائمة</button>
                     </div>
-                    <div class="card">
-                        <div class="card-img">🍟</div>
-                        <div class="card-body">
-                            <div class="card-title">بطاطس بالجبنة واللصوص</div>
-                            <div class="card-desc">بطاطس مقرمشة مغطاة بجبن التشيدر الذائب والصلصة الخاصة</div>
-                            <span class="price">12 ريال</span>
-                            <button class="btn" onclick="placeOrder('بطاطس بالجبنة', 12)">اطلب الآن</button>
-                        </div>
+
+                    <!-- فرع 2: الطلبات وإثبات التوصيل -->
+                    <div id="secOrders" class="admin-panel-section">
+                        <h4 style="color:#d4af37; margin-bottom:10px;">📦 طلبات العملاء الحية</h4>
+                        <div id="adminOrdersList"><p style="color:#777;">جاري التحميل...</p></div>
+                    </div>
+
+                    <!-- فرع 3: إدارة العملاء والنقاط -->
+                    <div id="secUsers" class="admin-panel-section">
+                        <h4 style="color:#d4af37; margin-bottom:10px;">👥 إدارة حسابات العملاء ونقاط الولاء</h4>
+                        <div id="adminUsersList"><p style="color:#777;">جاري التحميل...</p></div>
+                    </div>
+
+                    <!-- فرع 4: الإعلانات والرسائل -->
+                    <div id="secAds" class="admin-panel-section">
+                        <h4 style="color:#d4af37; margin-bottom:10px;">📢 إرسال إعلان أو رسالة فورية للعملاء</h4>
+                        <input type="text" id="adTitleInput" class="admin-input" placeholder="عنوان الإعلان (مثلاً: خصم 50% اليوم)">
+                        <input type="text" id="adDescInput" class="admin-input" placeholder="تفاصيل الإعلان أو الرسالة">
+                        <button class="btn" onclick="publishAnnouncement()">نشر الإعلان والرسالة فوراً</button>
                     </div>
                 </div>
             </div>
 
-            <!-- لوحة الطلبات الحية -->
-            <div id="ordersTab" class="screen">
-                <h2 style="margin-bottom: 15px; color: #444;">الطلبات الواردة (تحديث حي ⚡)</h2>
-                <div id="ordersContainer">
-                    <p style="color: #777;">جاري تحميل الطلبات...</p>
-                </div>
-            </div>
+        </div>
+
+        <!-- الشريط السفلي للتنقل (مطابق لهنقرستيشن) -->
+        <div class="bottom-nav">
+            <button class="nav-item active" onclick="switchNavTab('tabHome', this)">
+                <span class="icon">🏠</span> الرئيسية
+            </button>
+            <button class="nav-item" onclick="switchNavTab('tabHistory', this)">
+                <span class="icon">📋</span> السجل
+            </button>
+            <button class="nav-item" onclick="switchNavTab('tabRewards', this)">
+                <span class="icon">⭐</span> المكافآت
+            </button>
+            <button class="nav-item" onclick="switchNavTab('tabAccount', this)">
+                <span class="icon">👤</span> الحساب
+            </button>
         </div>
     </div>
 
-    <!-- Firebase والربط الكامل -->
+    <!-- Firebase SDK والمنطق البرمجي -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, updateDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, updateDoc, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCbT5oJoSWA31DDkfuZ1pHmcjjUh_PiLmw",
@@ -145,96 +224,328 @@
         const db = getFirestore(app);
 
         let currentUser = localStorage.getItem('tikka_user') || "";
+        let currentPhone = localStorage.getItem('tikka_phone') || "";
+        let currentCategoryFilter = 'meals';
 
-        // التحقق من حالة تسجيل الدخول مسبقاً
         if (currentUser) {
-            document.getElementById('welcomeUser').innerText = "مرحباً، " + currentUser;
-            document.getElementById('authScreen').classList.remove('active');
-            document.getElementById('appScreen').classList.add('active');
+            initAppSession();
         }
 
-        window.login = function() {
+        window.login = async function() {
             let name = document.getElementById('userName').value.trim();
-            if (!name) {
-                alert("الرجاء إدخال الاسم يا بطل!");
+            let phone = document.getElementById('userPhone').value.trim();
+            if (!name || !phone) {
+                alert("الرجاء إدخال الاسم ورقم الجوال!");
                 return;
             }
             localStorage.setItem('tikka_user', name);
+            localStorage.setItem('tikka_phone', phone);
             currentUser = name;
+            currentPhone = phone;
+
+            // حفظ بيانات المستخدم في قاعدة البيانات لقائمتك بالأدمن
+            try {
+                await setDoc(doc(db, "users", phone), {
+                    name: name,
+                    phone: phone,
+                    points: 0,
+                    lastLogin: serverTimestamp()
+                }, { merge: true });
+            } catch(e) { console.error(e); }
+
+            initAppSession();
+        }
+
+        async function initAppSession() {
             document.getElementById('welcomeUser').innerText = "مرحباً، " + currentUser;
+            document.getElementById('accName').innerText = currentUser;
+            document.getElementById('accPhone').innerText = currentPhone;
             document.getElementById('authScreen').classList.remove('active');
             document.getElementById('appScreen').classList.add('active');
+
+            // إذا كان المستخدم أنت (سلومي) أو رقمك، نظهر له لوحة الأدمن
+            if (currentUser === "سلومي" || currentPhone.includes("05")) {
+                document.getElementById('adminPanelWrapper').style.display = "block";
+            }
+
+            // جلب نقاط المستخدم
+            try {
+                let userDoc = await getDoc(doc(db, "users", currentPhone));
+                if (userDoc.exists()) {
+                    let pts = userDoc.data().points || 0;
+                    document.getElementById('myPointsDisplay').innerText = pts + " نقطة";
+                    document.getElementById('accPoints').innerText = pts + " نقطة";
+                }
+            } catch(e) {}
         }
 
         window.logout = function() {
-            localStorage.removeItem('tikka_user');
+            localStorage.clear();
             location.reload();
         }
 
-        window.switchMainTab = function(tabName, btn) {
-            document.querySelectorAll('#appScreen .screen').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.nav-tab-btn').forEach(b => b.classList.remove('active'));
-            if (tabName === 'menu') {
-                document.getElementById('menuTab').classList.add('active');
-            } else {
-                document.getElementById('ordersTab').classList.add('active');
-            }
+        // التنقل بين الشونق الأربع (الرئيسية، السجل، المكافآت، الحساب)
+        window.switchNavTab = function(tabId, btn) {
+            document.querySelectorAll('#appScreen > .container > .screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.bottom-nav .nav-item').forEach(b => b.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.add('active');
             btn.classList.add('active');
         }
 
-        // إرسال الطلب لـ Firebase مع اسم العميل
-        window.placeOrder = async function(itemName, price) {
+        window.switchCategory = function(cat, btn) {
+            currentCategoryFilter = cat;
+            document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            loadProductsUI();
+        }
+
+        // فرعيات لوحة الأدمن
+        window.switchAdminSub = function(secId, btn) {
+            document.querySelectorAll('.admin-panel-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.admin-sec-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(secId).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        // جلب الموقع تلقائياً من الآيفون (GPS)
+        function getUserLocation() {
+            return new Promise((resolve) => {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (pos) => resolve(`GPS: ${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`),
+                        () => resolve("المدينة المنورة (افتراضي)"),
+                        { timeout: 5000 }
+                    );
+                } else { resolve("غير مدعوم"); }
+            });
+        }
+
+        // طلب وجبة مع إمكانية استخدام نقاط المكافآت لخصم الفاتورة
+        window.placeOrder = async function(itemName, priceStr) {
+            let numericPrice = parseFloat(priceStr) || 20;
+            let usePoints = confirm("هل تريد استخدام نقاط المكافآت لخصم جزء من السعر؟");
+            let discount = 0;
+
+            if (usePoints) {
+                try {
+                    let userDocRef = doc(db, "users", currentPhone);
+                    let userSnap = await getDoc(userDocRef);
+                    if (userSnap.exists()) {
+                        let pts = userSnap.data().points || 0;
+                        if (pts >= 10) {
+                            discount = Math.floor(pts / 10); // كل 10 نقاط بريال
+                            numericPrice = Math.max(0, numericPrice - discount);
+                            await updateDoc(userDocRef, { points: pts % 10 }); // خصم النقاط المستستخدمة
+                            alert(`تم خصم ${discount} ريال من قيمة الطلب مقابل نقاطك!`);
+                        } else {
+                            alert("نقاطك أقل من 10، لا يمكن الخصم حالياً.");
+                        }
+                    }
+                } catch(e) {}
+            }
+
+            let loc = await getUserLocation();
             try {
                 await addDoc(collection(db, "orders"), {
                     customer: currentUser,
+                    phone: currentPhone,
                     item: itemName,
-                    price: price + " ريال",
-                    status: "قيد المراجعة ⏳",
-                    time: serverTimestamp()
+                    price: numericPrice + " ريال",
+                    status: "تم قبول طلبك ✅",
+                    locationText: loc,
+                    proofImage: "",
+                    createdAt: serverTimestamp()
                 });
-                alert("تم إرسال طلبك بنجاح يا " + currentUser + "! جاري التجهيز 🚀");
-            } catch (e) {
-                console.error(e);
-                alert("فشل الإرسال، تحقق من اتصال قاعدة البيانات.");
+
+                // إضافة 5 نقاط ولاء للعميل مع كل طلب جديد
+                let userRef = doc(db, "users", currentPhone);
+                let uSnap = await getDoc(userRef);
+                let curPts = (uSnap.exists() ? (uSnap.data().points || 0) : 0) + 5;
+                await setDoc(userRef, { points: curPts }, { merge: true });
+                document.getElementById('myPointsDisplay').innerText = curPts + " نقطة";
+                document.getElementById('accPoints').innerText = curPts + " نقطة";
+
+                alert("تم إرسال طلبك بنجاح وحصولك على 5 نقاط ولاء جديدة! 🛵");
+            } catch(e) {
+                alert("خطأ في إرسال الطلب.");
             }
         }
 
-        // جلب الطلبات بشكل حي ومباشر
-        const container = document.getElementById('ordersContainer');
+        // الأدمن يضيف منتج
+        window.addNewProduct = async function() {
+            let name = document.getElementById('pName').value;
+            let price = document.getElementById('pPrice').value;
+            let category = document.getElementById('pCategory').value;
+            let img = document.getElementById('pImg').value || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c";
+            let desc = document.getElementById('pDesc').value;
+
+            if(!name || !price) { alert("أدخل الاسم والسعر!"); return; }
+            try {
+                await addDoc(collection(db, "products"), { name, price, category, img, desc });
+                alert("تم إضافة المنتج بنجاح!");
+                document.getElementById('pName').value = "";
+                document.getElementById('pPrice').value = "";
+                document.getElementById('pDesc').value = "";
+            } catch(e) { alert("فشل الإضافة."); }
+        }
+
+        // الأدمن ينشر إعلان ورسالة للعملاء
+        window.publishAnnouncement = async function() {
+            let title = document.getElementById('adTitleInput').value;
+            let desc = document.getElementById('adDescInput').value;
+            if(!title) { alert("أدخل عنوان الإعلان!"); return; }
+
+            try {
+                await setDoc(doc(db, "settings", "announcement"), { title, desc, active: true });
+                alert("تم نشر الإعلان والرسالة الفورية لجميع العملاء بنجاح!");
+            } catch(e) { alert("فشل النشر."); }
+        }
+
+        // الاستماع للإعلانات والرسائل الفورية من الأدمن
+        onSnapshot(doc(db, "settings", "announcement"), (docSnap) => {
+            if (docSnap.exists() && docSnap.data().active) {
+                let data = docSnap.data();
+                document.getElementById('activeAdsBanner').style.display = "block";
+                document.getElementById('adTitleText').innerText = data.title;
+                document.getElementById('adDescText').innerText = data.desc;
+
+                document.getElementById('appMessageBox').style.display = "block";
+                document.getElementById('adminMsgText').innerText = `📢 ${data.title}: ${data.desc}`;
+            }
+        });
+
+        // جلب المنتجات حسب التبويب (وجبات أو ماركت)
+        let allProductsCache = [];
+        onSnapshot(collection(db, "products"), (snapshot) => {
+            allProductsCache = [];
+            snapshot.forEach(docSnap => allProductsCache.push(docSnap.data()));
+            loadProductsUI();
+        });
+
+        function loadProductsUI() {
+            let gridHtml = "";
+            let filtered = allProductsCache.filter(p => p.category === currentCategoryFilter);
+            
+            if (filtered.length === 0) {
+                gridHtml = "<p style='color:#777;'>لا توجد منتجات مضافة لهذا القسم حالياً.</p>";
+            } else {
+                filtered.forEach(p => {
+                    gridHtml += `
+                        <div class="card">
+                            <img src="${p.img}" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c'">
+                            <div class="card-body">
+                                <div class="card-title">${p.name}</div>
+                                <div class="card-desc">${p.desc || 'منتج طازج ومميز'}</div>
+                                <span class="price">${p.price}</span>
+                                <button class="btn" onclick="placeOrder('${p.name}', '${p.price}')">اطلب الآن 🛵</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            document.getElementById('catalogGrid').innerHTML = gridHtml;
+        }
+
+        // جلب السجل والطلبات والأدمن
         onSnapshot(collection(db, "orders"), (snapshot) => {
-            container.innerHTML = "";
+            let historyHtml = "";
+            let adminOrdersHtml = "";
+
             if (snapshot.empty) {
-                container.innerHTML = "<p style='color: #777;'>لا توجد طلبات جديدة حالياً.</p>";
+                let emptyMsg = "<p style='color:#777;'>لا توجد طلبات.</p>";
+                document.getElementById('historyContainer').innerHTML = emptyMsg;
+                document.getElementById('adminOrdersList').innerHTML = emptyMsg;
+                return;
+            }
+
+            snapshot.forEach((docSnap) => {
+                let data = docSnap.data();
+                let id = docSnap.id;
+                let dateStr = data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleString('ar-SA') : 'الآن';
+
+                let itemCard = `
+                    <div class="order-card">
+                        <h4>الطلب: ${data.item} (${data.price})</h4>
+                        <p style="color:#aaa;">التاريخ والوقت: ${dateStr}</p>
+                        <p style="color:#aaa;">الموقع: ${data.locationText}</p>
+                        <p>الحالة: <span class="status-badge">${data.status}</span></p>
+                        ${data.proofImage ? `<br><img src="${data.proofImage}" style="width:70px; height:70px; border-radius:6px; object-fit:cover; margin-top:5px; border:1px solid #d4af37;"><p style="color:#27ae60; font-size:11px;">إثبات التسليم مرفق ✅</p>` : ''}
+                    </div>
+                `;
+
+                if (data.customer === currentUser) {
+                    historyHtml += itemCard;
+                }
+
+                // لوحة الأدمن للطلبات
+                adminOrdersHtml += `
+                    <div class="order-card">
+                        <h4>${data.item} - ${data.price}</h4>
+                        <p style="color:#aaa;">العميل: ${data.customer} | جوال: ${data.phone}</p>
+                        <p style="color:#aaa;">الوقت: ${dateStr} | ${data.locationText}</p>
+                        <p>الحالة: <span class="status-badge">${data.status}</span></p>
+                        ${data.proofImage ? `<img src="${data.proofImage}" style="width:60px; height:60px; border-radius:6px; object-fit:cover; margin-top:5px;">` : ''}
+                        
+                        <div style="margin-top:10px; display:flex; gap:5px; flex-wrap:wrap;">
+                            <button style="background:#d4af37; color:#121212; border:none; padding:5px 10px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:11px;" onclick="updateOrderStatus('${id}', 'تم قبول طلبك ✅')">قبول</button>
+                            <button style="background:#e67e22; color:white; border:none; padding:5px 10px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:11px;" onclick="updateOrderStatus('${id}', 'جاري التجهيز 👨‍🍳')">تجهيز</button>
+                            <button style="background:#2980b9; color:white; border:none; padding:5px 10px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:11px;" onclick="updateOrderStatus('${id}', 'الطلب قادم إليك 🛵')">قادم إليك</button>
+                            <button style="background:#27ae60; color:white; border:none; padding:5px 10px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:11px;" onclick="deliverWithProof('${id}')">إتمام وإرفاق صورة التسليم</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('historyContainer').innerHTML = historyHtml || "<p style='color:#777;'>ليس لديك طلبات سابقة في السجل.</p>";
+            document.getElementById('adminOrdersList').innerHTML = adminOrdersHtml;
+        });
+
+        // جلب وعرض بيانات كل العملاء المسجلين في لوحة الأدمن
+        onSnapshot(collection(db, "users"), (snapshot) => {
+            let usersHtml = "";
+            if (snapshot.empty) {
+                document.getElementById('adminUsersList').innerHTML = "<p style='color:#777;'>لا توجد حسابات مسجلة.</p>";
                 return;
             }
             snapshot.forEach((docSnap) => {
-                const data = docSnap.data();
-                const id = docSnap.id;
-                
-                let div = document.createElement('div');
-                div.className = 'order-box';
-                div.innerHTML = `
-                    <div class="order-info">
-                        <h4>الطلب: ${data.item} (${data.price})</h4>
-                        <p>العميل: <strong>${data.customer || 'مجهول'}</strong></p>
-                        <p>الحالة: <span class="status-badge">${data.status}</span></p>
-                    </div>
-                    <div class="admin-actions">
-                        <button class="accept-btn" onclick="updateStatus('${id}', 'جاري التحضير 👨‍🍳')">قبول</button>
-                        <button class="complete-btn" onclick="updateStatus('${id}', 'تم التوصيل بنجاح ✅')">إتمام</button>
+                let u = docSnap.data();
+                usersHtml += `
+                    <div style="background:#222; border:1px solid #444; padding:10px; border-radius:8px; margin-bottom:8px; font-size:12px;">
+                        <p style="color:#fff; font-weight:bold;">الاسم: ${u.name} | الجوال: ${u.phone}</p>
+                        <p style="color:#d4af37; margin-top:3px;">رصيد النقاط: ${u.points || 0} نقطة</p>
+                        <button style="background:#d4af37; color:#121212; border:none; padding:4px 8px; border-radius:4px; margin-top:6px; cursor:pointer; font-weight:bold;" onclick="addCustomPoints('${u.phone}')">➕ تعديل وإضافة نقاط</button>
                     </div>
                 `;
-                container.appendChild(div);
             });
+            document.getElementById('adminUsersList').innerHTML = usersHtml;
         });
 
-        window.updateStatus = async function(id, newStatus) {
+        window.addCustomPoints = async function(phoneNum) {
+            let ptsToAdd = prompt("أدخل عدد النقاط المراد إضافتها لهذا العميل:", "10");
+            if (!ptsToAdd) return;
             try {
-                const orderRef = doc(db, "orders", id);
-                await updateDoc(orderRef, { status: newStatus });
-            } catch (e) {
-                console.error("خطأ بالتحديث:", e);
-            }
+                let userRef = doc(db, "users", phoneNum);
+                let uSnap = await getDoc(userRef);
+                let currentPts = uSnap.exists() ? (uSnap.data().points || 0) : 0;
+                let newTotal = currentPts + parseInt(ptsToAdd);
+                await setDoc(userRef, { points: newTotal }, { merge: true });
+                alert("تم تحديث وإضافة النقاط للعميل بنجاح!");
+            } catch(e) { alert("خطأ في التحديث."); }
+        }
+
+        window.updateOrderStatus = async function(id, statusText) {
+            await updateDoc(doc(db, "orders", id), { status: statusText });
+        }
+
+        window.deliverWithProof = async function(id) {
+            let imgUrl = prompt("أدخل رابط صورة إثبات تسليم الطلب:", "https://images.unsplash.com/photo-15263674608b7-2015093f4585");
+            if (!imgUrl) return;
+            await updateDoc(doc(db, "orders", id), {
+                status: "تم توصيل الطلب بنجاح ✅",
+                proofImage: imgUrl
+            });
+            alert("تم إتمام الطلب وإرفاق صورة الإثبات بنجاح!");
         };
     </script>
 </body>
