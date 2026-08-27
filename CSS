@@ -1,0 +1,15 @@
+.app-header {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    background-color: #0b0b0b;
+    color: #d4af37;
+}
+
+.corner-logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%; /* يعطيه شكل دائري فخم متناسق مع تصميم الشعار */
+    border: 1px solid #d4af37;
+    margin-left: 10px;
+}
