@@ -531,20 +531,20 @@
         }
 
         function loadAdminProductsUI() {
-            let adminProdHtml = "";
+            let adminHtml = "";
             if (allProductsRaw.length === 0) {
-                document.getElementById('adminProductsList').innerHTML = "<p style='color:#777;'>لا توجد منتجات مسجلة.</p>";
-                return;
+                adminHtml = "<p style='color:#777;'>لا توجد منتجات مضافة حالياً.</p>";
+            } else {
+                allProductsRaw.forEach(p => {
+                    adminHtml += `
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee; font-size: 13px;">
+                            <span><b>${p.name}</b> (${p.price})</span>
+                            <button class="logout-btn" style="background:#ffeaa7; border-color:#d4af37;" onclick="deleteProduct('${p.id}')">حذف</button>
+                        </div>
+                    `;
+                });
             }
-            allProductsRaw.forEach(p => {
-                adminProdHtml += `
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee; font-size:13px;">
-                        <span><b>${p.name}</b> (${p.price})</span>
-                        <button style="background:#e74c3c; color:#fff; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;" onclick="deleteProduct('${p.id}')">حذف</button>
-                    </div>
-                `;
-            });
-            document.getElementById('adminProductsList').innerHTML = adminProdHtml;
+            document.getElementById('adminProductsList').innerHTML = adminHtml;
         }
 
         window.addToCart = function(name, priceStr) {
@@ -553,32 +553,35 @@
             if (existing) {
                 existing.qty += 1;
             } else {
-                cart.push({ name: name, price: numericPrice, qty: 1 });
+                cart.push({ name, price: numericPrice, qty: 1 });
             }
             updateCartUI();
-            alert("تم إضافة المنتج إلى السلة بنجاح!");
+            alert("تمت إضافة المنتج إلى السلة بنجاح!");
         }
 
-        window.changeCartQty = function(index, delta) {
-            cart[index].qty += delta;
-            if (cart[index].qty <= 0) {
-                cart.splice(index, 1);
+        window.changeQty = function(name, delta) {
+            let item = cart.find(i => i.name === name);
+            if (item) {
+                item.qty += delta;
+                if (item.qty <= 0) {
+                    cart = cart.filter(i => i.name !== name);
+                }
             }
             updateCartUI();
         }
 
         function updateCartUI() {
-            let container = document.getElementById('cartItemsContainer');
-            let checkoutSec = document.getElementById('cartCheckoutSection');
+            let totalQty = cart.reduce((sum, i) => sum + i.qty, 0);
             let badge = document.getElementById('cartBadge');
-
-            let totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
             if (totalQty > 0) {
                 badge.innerText = totalQty;
                 badge.style.display = "block";
             } else {
                 badge.style.display = "none";
             }
+
+            let container = document.getElementById('cartItemsContainer');
+            let checkoutSec = document.getElementById('cartCheckoutSection');
 
             if (cart.length === 0) {
                 container.innerHTML = "<p style='color: #777;'>السلة فارغة حالياً.</p>";
@@ -588,24 +591,20 @@
 
             let html = "";
             let totalPrice = 0;
-            cart.forEach((item, index) => {
-                let itemTotal = item.price * item.qty;
-                totalPrice += itemTotal;
+            cart.forEach(i => {
+                let sub = i.price * i.qty;
+                totalPrice += sub;
                 html += `
                     <div class="cart-item-row">
-                        <div>
-                            <strong>${item.name}</strong><br>
-                            <span style="color:#b8860b;">${item.price} ريال × ${item.qty} = ${itemTotal} ريال</span>
-                        </div>
+                        <div><b>${i.name}</b> (${i.price} ريال)</div>
                         <div class="qty-controls">
-                            <button class="qty-btn" onclick="changeCartQty(${index}, 1)">+</button>
-                            <span>${item.qty}</span>
-                            <button class="qty-btn" onclick="changeCartQty(${index}, -1)">-</button>
+                            <button class="qty-btn" onclick="changeQty('${i.name.replace(/'/g, "\\'")}', -1)">-</button>
+                            <span>${i.qty}</span>
+                            <button class="qty-btn" onclick="changeQty('${i.name.replace(/'/g, "\\'")}', 1)">+</button>
                         </div>
                     </div>
                 `;
             });
-
             container.innerHTML = html;
             document.getElementById('cartTotalPriceText').innerText = "المبلغ الإجمالي: " + totalPrice + " ريال";
             checkoutSec.style.display = "block";
@@ -621,129 +620,123 @@
                 return;
             }
 
-            let totalPrice = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            let totalPrice = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
 
             try {
                 await addDoc(collection(db, "orders"), {
-                    userName: currentUser,
-                    userPhone: phone,
-                    location: location,
-                    notes: notes,
+                    customerName: currentUser,
+                    customerPhone: phone,
+                    location,
+                    notes,
                     items: cart,
-                    total: totalPrice,
-                    status: "قيد المراجعة ⏳",
+                    totalPrice,
+                    status: "قيد المراجعة 🕒",
                     createdAt: serverTimestamp()
                 });
 
-                // Add loyalty points (+1 for every 10 riyals)
+                // تحديث النقاط (كل 10 ريال نقطة مثلاً أو حسب الرغبة)
                 let earnedPoints = Math.floor(totalPrice / 10);
                 let userRef = doc(db, "users", currentPhone);
                 let userSnap = await getDoc(userRef);
-                let currentPoints = 0;
-                if(userSnap.exists()) {
-                    currentPoints = userSnap.data().points || 0;
+                let currentPts = 0;
+                if (userSnap.exists()) {
+                    currentPts = userSnap.data().points || 0;
                 }
-                let newTotalPoints = currentPoints + earnedPoints;
-                await updateDoc(userRef, { points: newTotalPoints });
+                let newPts = currentPts + earnedPoints;
+                await updateDoc(userRef, { points: newPts });
 
-                document.getElementById('myPointsDisplay').innerText = newTotalPoints + " نقطة";
-                document.getElementById('accPoints').innerText = newTotalPoints + " نقطة";
-
-                alert("تم إرسال طلبك بنجاح! شكراً لاختيارك تكة.");
+                alert("تم إرسال طلبك بنجاح! شكراً لك.");
                 cart = [];
                 updateCartUI();
-                document.getElementById('deliveryLocation').value = "";
                 switchNavTab('tabHistory', document.querySelectorAll('.bottom-nav .nav-item')[2]);
             } catch(e) {
-                alert("حدث خطأ أثناء إتمام الطلب.");
+                alert("حدث خطأ أثناء إرسال الطلب.");
             }
         }
 
-        // Live Orders Listener
+        // الاستماع للطلبات وتحديث السجل ولوحة التحكم
         onSnapshot(collection(db, "orders"), (snapshot) => {
+            let historyHtml = "";
             let adminOrdersHtml = "";
-            let userHistoryHtml = "";
-            let routingHtmlMap = {};
+            let adminRoutingHtml = "";
+            let myOrders = [];
 
             snapshot.forEach(docSnap => {
                 let order = docSnap.data();
-                let dateStr = order.createdAt ? new Date(order.createdAt.seconds * 1000).toLocaleString('ar-SA') : 'الآن';
-                
-                let itemsListText = order.items.map(i => `${i.name} (×${i.qty})`).join(', ');
+                order.id = docSnap.id;
 
-                // Admin orders view
+                if (order.customerPhone === currentPhone) {
+                    myOrders.push(order);
+                }
+
+                let itemsListText = order.items.map(i => `${i.name} (×${i.qty})`).join('، ');
+                
                 adminOrdersHtml += `
                     <div class="order-card">
-                        <p><b>العميل:</b> ${order.userName} (${order.userPhone})</p>
+                        <p><b>العميل:</b> ${order.customerName} (${order.customerPhone})</p>
                         <p><b>الطلبات:</b> ${itemsListText}</p>
-                        <p><b>الإجمالي:</b> ${order.total} ريال</p>
                         <p><b>الموقع:</b> ${order.location}</p>
-                        <p><b>الملاحظات:</b> ${order.notes || 'لا يوجد'}</p>
-                        <p><b>التاريخ:</b> ${dateStr}</p>
-                        <div style="margin-top:8px;">
-                            <span class="status-badge">${order.status}</span>
+                        <p><b>المبلغ:</b> ${order.totalPrice} ريال</p>
+                        <p style="margin-top:5px;"><b>الحالة:</b> <span class="status-badge">${order.status}</span></p>
+                        <div style="margin-top:8px; display:flex; gap:6px;">
+                            <button class="logout-btn" onclick="updateOrderStatus('${order.id}', 'جاري التوصيل 🛵')">جاري التوصيل</button>
+                            <button class="logout-btn" style="background:#27ae60; color:#fff;" onclick="updateOrderStatus('${order.id}', 'تم التوصيل بنجاح ✅')">تم التوصيل</button>
                         </div>
                     </div>
                 `;
 
-                // Routing/WhatsApp List
-                routingHtmlMap[order.userPhone] = {
-                    name: order.userName,
-                    phone: order.userPhone,
-                    lastOrder: dateStr
-                };
-
-                // User History view
-                if (order.userPhone === currentPhone) {
-                    userHistoryHtml += `
-                        <div class="order-card">
-                            <p><b>رقم الطلب:</b> ${docSnap.id.substring(0,6)}</p>
-                            <p><b>الطلبات:</b> ${itemsListText}</p>
-                            <p><b>الإجمالي:</b> ${order.total} ريال</p>
-                            <p><b>الحالة:</b> <span class="status-badge">${order.status}</span></p>
-                            <p style="color:#777; font-size:11px; margin-top:5px;">التاريخ: ${dateStr}</p>
-                        </div>
-                    `;
-                }
+                adminRoutingHtml += `
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #eee; font-size:13px;">
+                        <span><b>${order.customerName}</b> (${order.customerPhone})</span>
+                        <a href="https://wa.me/966${order.customerPhone.replace(/^0/, '')}?text=${encodeURIComponent('مرحباً يا ' + order.customerName + '، تم إتمام طلبك من تكة بنجاح 🛵')}" target="_blank" style="background:#27ae60; color:#white; padding:5px 10px; border-radius:6px; text-decoration:none; font-size:12px; font-weight:bold;">إرسال واتساب 🟢</a>
+                    </div>
+                `;
             });
 
-            document.getElementById('adminOrdersList').innerHTML = adminOrdersHtml || "<p style='color:#777;'>لا توجد طلبات سابقة.</p>";
-            document.getElementById('historyContainer').innerHTML = userHistoryHtml || "<p style='color:#777;'>لا توجد طلبات سابقة خاصة بك.</p>";
-
-            let routingHtml = "";
-            for (let phoneKey in routingHtmlMap) {
-                let u = routingHtmlMap[phoneKey];
-                let cleanPhone = u.phone.replace(/[^0-9]/g, '');
-                routingHtml += `
-                    <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #eee; font-size:13px;">
-                        <div>
-                            <b>${u.name}</b><br>
-                            <span style="color:#777;">جوال: ${u.phone}</span>
+            if (myOrders.length === 0) {
+                historyHtml = "<p style='color: #777;'>لا توجد طلبات سابقة.</p>";
+            } else {
+                myOrders.forEach(o => {
+                    let itemsTxt = o.items.map(i => `${i.name} (×${i.qty})`).join('، ');
+                    historyHtml += `
+                        <div class="order-card">
+                            <p><b>رقم الطلب:</b> ${o.id.slice(0,6)}</p>
+                            <p><b>المنتجات:</b> ${itemsTxt}</p>
+                            <p><b>المبلغ الإجمالي:</b> ${o.totalPrice} ريال</p>
+                            <p style="margin-top:5px;"><b>حالة الطلب:</b> <span class="status-badge">${o.status}</span></p>
                         </div>
-                        <a href="https://wa.me/${cleanPhone}?text=مرحباً بك يا ${encodeURIComponent(u.name)}، تم إتمام طلبك بنجاح من تطبيق تكة 🛵" target="_blank" style="background:#27ae60; color:#fff; padding:6px 12px; border-radius:6px; text-decoration:none; font-weight:bold; font-size:12px;">إرسال واتساب 🟢</a>
-                    </div>
-                `;
+                    `;
+                });
             }
-            document.getElementById('adminRoutingList').innerHTML = routingHtml || "<p style='color:#777;'>لا توجد بيانات عملاء للتوجيه حالياً.</p>";
+
+            document.getElementById('historyContainer').innerHTML = historyHtml;
+            document.getElementById('adminOrdersList').innerHTML = adminOrdersHtml || "<p style='color:#777;'>لا توجد طلبات جديدة.</p>";
+            document.getElementById('adminRoutingList').innerHTML = adminRoutingHtml || "<p style='color:#777;'>لا توجد أرقام متاحة للتوجيه حالياً.</p>";
         });
 
-        // Load users list for Admin
+        window.updateOrderStatus = async function(orderId, newStatus) {
+            try {
+                await updateDoc(doc(db, "orders", orderId), { status: newStatus });
+                alert("تم تحديث حالة الطلب بنجاح!");
+            } catch(e) {
+                alert("فشل تحديث الحالة.");
+            }
+        }
+
+        // جلب قائمة العملاء
         onSnapshot(collection(db, "users"), (snapshot) => {
             let usersHtml = "";
             snapshot.forEach(docSnap => {
                 let u = docSnap.data();
                 usersHtml += `
-                    <div style="padding:10px 0; border-bottom:1px solid #eee; font-size:13px;">
-                        <b>الاسم:</b> ${u.name} | <b>الجوال:</b> ${u.phone} | <span style="color:#b8860b;"><b>النقاط:</b> ${u.points || 0} نقطة</span>
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #eee; font-size:13px;">
+                        <span><b>${u.name}</b> (${u.phone})</span>
+                        <span style="color:#b8860b; font-weight:bold;">${u.points || 0} نقطة</span>
                     </div>
                 `;
             });
-            document.getElementById('adminUsersList').innerHTML = usersHtml || "<p style='color:#777;'>لا توجد عملاء مسجلين.</p>";
+            document.getElementById('adminUsersList').innerHTML = usersHtml || "<p style='color:#777;'>لا يوجد عملاء مسجلون حالياً.</p>";
         });
-
     </script>
 </body>
 </html>
-```eof
-
-Your updated application file for "تكة | Tikka" is ready! Feel free to take a look and let me know if you'd like to make any adjustments.
