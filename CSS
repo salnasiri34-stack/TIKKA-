@@ -1,9 +1,11 @@
 .app-header {
     display: flex;
     align-items: center;
-    padding: 15px;
+    justify-content: space-between; /* لضمان توزيع العناصر باحترافية داخل الهيدر */
+    padding: 15px 20px;
     background-color: #0b0b0b;
     color: #d4af37;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.2); /* خط ذهبي خفيف وفخم يفصل الهيدر عن المحتوى */
 }
 
 .corner-logo {
@@ -11,5 +13,11 @@
     height: 40px;
     border-radius: 50%; /* يعطيه شكل دائري فخم متناسق مع تصميم الشعار */
     border: 1px solid #d4af37;
-    margin-left: 10px;
+    object-fit: cover; /* لضمان عدم تشوه الصورة داخل الإطار الدائري */
+    box-shadow: 0 0 8px rgba(212, 175, 55, 0.3); /* إضاءة ذهبية خفيفة وناعمة للشعار */
+    transition: transform 0.3s ease; /* إضافة تأثير انسيابي */
+}
+
+.corner-logo:hover {
+    transform: scale(1.05); /* تكبير بسيييط عند مرور الماوس */
 }
