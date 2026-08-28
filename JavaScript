@@ -1,10 +1,103 @@
 window.addEventListener('load', () => {
-    // التحقق إذا كان الجهاز آيفون وليس مشغلاً كـ تطبيق مستقل مسبقاً
+    // 1. التحقق إذا كان الجهاز آيفون وليس مشغلاً كـ تطبيق مستقل مسبقاً
     const isIos = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
     const isInStandaloneMode = ('standalone' in window.navigator) && (window.navigator.standalone);
 
     if (isIos && !isInStandaloneMode) {
-        document.getElementById('add-to-home-banner').style.display = 'block';
+        const banner = document.getElementById('add-to-home-banner');
+        if (banner) banner.style.display = 'block';
+    }
+
+    // 2. الاستماع الفوري للطلبات من قاعدة البيانات لضمان ظهورها وتحديثها تلقائياً
+    if (typeof db !== 'undefined' && typeof collection !== 'undefined' && typeof onSnapshot !== 'undefined') {
+        onSnapshot(collection(db, "orders"), (snapshot) => {
+            let historyHtml = "";
+            let adminOrdersHtml = "";
+            let adminRoutingHtml = "";
+            let myOrders = [];
+
+            // جلب رقم جوال المستخدم الحالي المخزن في المتصفح
+            let currentPhone = localStorage.getItem('userPhone') || window.currentPhone || "";
+
+            snapshot.forEach(docSnap => {
+                let order = docSnap.data();
+                order.id = docSnap.id;
+
+                if (currentPhone && String(order.customerPhone).trim() === String(currentPhone).trim()) {
+                    myOrders.push(order);
+                }
+
+                let itemsListText = "";
+                try {
+                    if (Array.isArray(order.items)) {
+                        itemsListText = order.items.map(i => `${i.name || 'منتج'} (×${i.qty || 1})`).join('، ');
+                    } else if (order.items) {
+                        itemsListText = Object.values(order.items).map(i => `${i.name || 'منتج'} (×${i.qty || 1})`).join('، ');
+                    }
+                } catch (err) {
+                    itemsListText = "تفاصيل المنتجات";
+                }
+                
+                adminOrdersHtml += `
+                    <div class="order-card">
+                        <p><b>العميل:</b> ${order.customerName || 'بدون اسم'} (${order.customerPhone || 'بدون رقم'})</p>
+                        <p><b>الطلبات:</b> ${itemsListText}</p>
+                        <p><b>الموقع:</b> ${order.location || 'غير محدد'}</p>
+                        <p><b>الملاحظات:</b> ${order.notes || 'لا توجد'}</p>
+                        <p><b>المبلغ:</b> ${order.totalPrice || 0} ريال</p>
+                        <p style="margin-top:5px;"><b>الحالة:</b> <span class="status-badge">${order.status || 'قيد المراجعة 🕒'}</span></p>
+                        <div style="margin-top:8px; display:flex; gap:6px;">
+                            <button class="logout-btn" onclick="updateOrderStatus('${order.id}', 'جاري التوصيل 🛵')">جاري التوصيل</button>
+                            <button class="logout-btn" style="background:#27ae60; color:#fff;" onclick="updateOrderStatus('${order.id}', 'تم التوصيل بنجاح ✅')">تم التوصيل</button>
+                        </div>
+                    </div>
+                `;
+
+                let cleanPhone = order.customerPhone ? order.customerPhone.toString().replace(/^0/, '') : '';
+                adminRoutingHtml += `
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #222; font-size:13px;">
+                        <span><b>${order.customerName || 'عميل'}</b> (${order.customerPhone || ''})</span>
+                        <a href="https://wa.me/966${cleanPhone}?text=${encodeURIComponent('مرحباً يا ' + (order.customerName || '') + '، بخصوص طلبك من تكة 🛵')}" target="_blank" style="background:#27ae60; color:#fff; padding:5px 10px; border-radius:6px; text-decoration:none; font-size:12px; font-weight:bold;">واتساب 🟢</a>
+                    </div>
+                `;
+            });
+
+            if (myOrders.length === 0) {
+                historyHtml = "<p style='color: #777;'>لا توجد طلبات سابقة.</p>";
+            } else {
+                myOrders.forEach(o => {
+                    let itemsTxt = "";
+                    try {
+                        if (Array.isArray(o.items)) {
+                            itemsTxt = o.items.map(i => `${i.name || 'منتج'} (×${i.qty || 1})`).join('، ');
+                        } else if (o.items) {
+                            itemsTxt = Object.values(o.items).map(i => `${i.name || 'منتج'} (×${i.qty || 1})`).join('، ');
+                        }
+                    } catch (e) {
+                        itemsTxt = "طلباتك";
+                    }
+                    historyHtml += `
+                        <div class="order-card">
+                            <p><b>رقم الطلب:</b> ${o.id.slice(0,6)}</p>
+                            <p><b>المنتجات:</b> ${itemsTxt}</p>
+                            <p><b>المبلغ:</b> ${o.totalPrice || 0} ريال</p>
+                            <p style="margin-top:5px;"><b>الحالة:</b> <span class="status-badge">${o.status || 'قيد المراجعة'}</span></p>
+                        </div>
+                    `;
+                });
+            }
+
+            const historyContainer = document.getElementById('historyContainer');
+            if (historyContainer) historyContainer.innerHTML = historyHtml;
+
+            const adminOrdersList = document.getElementById('adminOrdersList');
+            if (adminOrdersList) adminOrdersList.innerHTML = adminOrdersHtml || "<p style='color:#777;'>لا توجد طلبات.</p>";
+
+            const adminRoutingList = document.getElementById('adminRoutingList');
+            if (adminRoutingList) adminRoutingList.innerHTML = adminRoutingHtml || "<p style='color:#777;'>لا توجد أرقام.</p>";
+        }, (error) => {
+            console.error("Firestore Error:", error);
+        });
     }
 });
 
