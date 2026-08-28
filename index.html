@@ -119,7 +119,6 @@
         .admin-panel-section.active { display: block; }
         .admin-input { width: 100%; padding: 10px; background: #1f1f1f; border: 1px solid #333; color: #fff; border-radius: 6px; margin-bottom: 10px; font-size: 13px; }
 
-        /* تنسيق كارد الطلب في لوحة الأدمن مع إطارات وأطراف تنبيه حمراء */
         .order-card { 
             background: #141414; 
             border: 2px solid #e74c3c; 
@@ -132,7 +131,6 @@
         }
         .status-badge { background: #2c250a; color: #d4af37; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: bold; display: inline-block; border: 1px solid #d4af37; }
 
-        /* تصميم قائمة المنتجات المصغرة داخل كارد الطلب بالأدمن */
         .order-product-item {
             display: flex;
             align-items: center;
@@ -217,13 +215,51 @@
                 <div id="cartItemsContainer"><p style="color: #777;">السلة فارغة حالياً.</p></div>
                 
                 <div id="cartCheckoutSection" style="display:none; margin-top: 20px; background: #141414; border: 1px solid #222; padding: 20px; border-radius: 12px;">
+                    
+                    <!-- قسم أكواد الخصم -->
+                    <div style="margin-bottom: 15px; border-bottom: 1px solid #222; padding-bottom: 12px;">
+                        <label style="font-size: 13px; color: #d4af37; display: block; margin-bottom: 5px;">🎟️ كود الخصم:</label>
+                        <div style="display:flex; gap:8px;">
+                            <input type="text" id="couponCodeInput" class="admin-input" style="margin-bottom:0;" placeholder="أدخل كود الخصم إن وجد">
+                            <button class="logout-btn" style="background:#d4af37; color:#0b0b0b; font-weight:bold; padding:0 15px;" onclick="applyCouponCode()">تطبيق</button>
+                        </div>
+                        <p id="couponMsg" style="font-size: 12px; margin-top: 5px; color:#27ae60;"></p>
+                    </div>
+
+                    <!-- أزرار تفعيل المكافآت والمحفظة -->
+                    <div style="margin-bottom: 15px; border-bottom: 1px solid #222; padding-bottom: 12px; display: flex; flex-direction: column; gap: 10px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; background:#1a1a1a; padding:10px; border-radius:8px;">
+                            <div>
+                                <span style="font-size:13px; color:#fff; font-weight:bold;">⭐ مكافآت النقاط (<span id="cartPointsDisplay">0</span> نقطة)</span>
+                                <p style="font-size:11px; color:#aaa;">الخصم: <span id="cartPointsValue">0</span> ريال</p>
+                            </div>
+                            <div style="display:flex; gap:5px;">
+                                <button id="btnEnablePoints" class="logout-btn" style="background:#27ae60; color:#fff; font-weight:bold;" onclick="toggleRewardsUsage(true)">تشغيل</button>
+                                <button id="btnDisablePoints" class="logout-btn" style="background:#444; color:#aaa;" onclick="toggleRewardsUsage(false)">إيقاف</button>
+                            </div>
+                        </div>
+
+                        <div style="display:flex; justify-content:space-between; align-items:center; background:#1a1a1a; padding:10px; border-radius:8px;">
+                            <div>
+                                <span style="font-size:13px; color:#fff; font-weight:bold;">💰 رصيد المحفظة (<span id="cartWalletDisplay">0</span> ريال)</span>
+                                <p style="font-size:11px; color:#aaa;">استخدام رصيد التعويضات والهدايا</p>
+                            </div>
+                            <div style="display:flex; gap:5px;">
+                                <button id="btnEnableWallet" class="logout-btn" style="background:#27ae60; color:#fff; font-weight:bold;" onclick="toggleWalletUsage(true)">تشغيل</button>
+                                <button id="btnDisableWallet" class="logout-btn" style="background:#444; color:#aaa;" onclick="toggleWalletUsage(false)">إيقاف</button>
+                            </div>
+                        </div>
+                    </div>
+
                     <h3 style="color: #d4af37; margin-bottom: 12px; font-size: 16px;">تفاصيل وموقع التوصيل 📍</h3>
                     <input type="text" id="deliveryLocation" class="admin-input" placeholder="عنوان التوصيل بالتفصيل (الحي، الشارع، رقم البناية)">
                     <input type="tel" id="deliveryPhone" class="admin-input" placeholder="رقم الجوال للتواصل">
                     <textarea id="deliveryNotes" class="admin-input" placeholder="ملاحظات إضافية للطلب (اختياري)..." style="height:60px;"></textarea>
 
                     <div class="cart-summary-box">
-                        <p style="font-size:14px; font-weight:bold; color:#d4af37;" id="cartTotalPriceText">المبلغ الإجمالي: 0 ريال</p>
+                        <p style="font-size:13px; color:#ccc;" id="cartSubtotalText">مجموع المنتجات: 0 ريال</p>
+                        <p style="font-size:13px; color:#e74c3c;" id="cartDiscountText" style="display:none;">قيمة الخصم: 0 ريال</p>
+                        <p style="font-size:15px; font-weight:bold; color:#d4af37; margin-top:5px;" id="cartTotalPriceText">المبلغ الإجمالي النهائي: 0 ريال</p>
                     </div>
 
                     <button class="btn" style="margin-top: 15px; background-color: #27ae60; color:#fff;" onclick="checkoutCart()">إتمام وإرسال الطلب نهائياً 🛵</button>
@@ -244,12 +280,22 @@
                 </div>
             </div>
 
+            <!-- شاشة المحفظة للعميل -->
+            <div id="tabWallet" class="screen">
+                <div style="background: #141414; border: 1px solid #222; padding: 25px; border-radius: 15px; text-align: center; margin-bottom: 20px;">
+                    <h2 style="color: #d4af37; margin-bottom: 10px;">محفظتي والتعويضات 💰</h2>
+                    <p style="color: #aaa; font-size: 13px; margin-bottom: 15px;">رصيدك المتاح للهدايا والتعويضات لاستخدامه في طلباتك القادمة</p>
+                    <div style="font-size: 30px; font-weight: bold; color: #27ae60;" id="myWalletDisplay">0 ريال</div>
+                </div>
+            </div>
+
             <div id="tabAccount" class="screen">
                 <div style="background: #141414; border: 1px solid #222; padding: 20px; border-radius: 12px;">
                     <h2 style="color: #d4af37; margin-bottom: 15px; font-size: 18px;">معلومات الحساب الشخصي 👤</h2>
                     <p style="margin-bottom: 10px; color:#aaa;">الاسم: <strong id="accName" style="color:#fff;">-</strong></p>
                     <p style="margin-bottom: 10px; color:#aaa;">رقم الجوال: <strong id="accPhone" style="color:#fff;">-</strong></p>
                     <p style="margin-bottom: 10px; color:#aaa;">رصيد النقاط: <strong id="accPoints" style="color:#d4af37;">0 نقطة</strong></p>
+                    <p style="margin-bottom: 10px; color:#aaa;">رصيد المحفظة: <strong id="accWallet" style="color:#27ae60;">0 ريال</strong></p>
                 </div>
 
                 <button class="admin-trigger-btn" onclick="openAdminPanelWithPassword()">🔑 لوحة تحكم الأدمن</button>
@@ -260,7 +306,8 @@
                     <div class="admin-sections-nav">
                         <button class="admin-sec-btn active" onclick="switchAdminSub('secProducts', this)">إدارة المنتجات</button>
                         <button class="admin-sec-btn" onclick="switchAdminSub('secOrders', this)">متابعة الطلبات</button>
-                        <button class="admin-sec-btn" onclick="switchAdminSub('secUsers', this)">إدارة العملاء</button>
+                        <button class="admin-sec-btn" onclick="switchAdminSub('secUsers', this)">العملاء والنقاط</button>
+                        <button class="admin-sec-btn" onclick="switchAdminSub('secCoupons', this)">أكواد الخصم</button>
                         <button class="admin-sec-btn" onclick="switchAdminSub('secAds', this)">الإعلانات</button>
                         <button class="admin-sec-btn" onclick="switchAdminSub('secRouting', this)" style="background:#27ae60; color:#fff;">واتساب 🟢</button>
                     </div>
@@ -296,13 +343,30 @@
                         <div id="adminOrdersList"><p style="color:#777;">جاري التحميل...</p></div>
                     </div>
 
+                    <!-- قسم إدارة العملاء والنقاط والمحفظة -->
                     <div id="secUsers" class="admin-panel-section">
-                        <h4 style="color:#d4af37; margin-bottom:10px;">👥 قائمة العملاء</h4>
+                        <h4 style="color:#d4af37; margin-bottom:10px;">👥 إدارة عملاء التطبيق ومنح النقاط / الرصيد</h4>
                         <div id="adminUsersList"><p style="color:#777;">جاري التحميل...</p></div>
                     </div>
 
+                    <!-- قسم أكواد الخصم -->
+                    <div id="secCoupons" class="admin-panel-section">
+                        <h4 style="color:#d4af37; margin-bottom:10px;">🎟️ إنشاء وإدارة أكواد الخصم</h4>
+                        <input type="text" id="couponCodeText" class="admin-input" placeholder="رمز الكود (مثلاً: TIKKA50)">
+                        <input type="number" id="couponDiscountVal" class="admin-input" placeholder="قيمة الخصم (ريال أو نسبة مئوية)">
+                        <select id="couponType" class="admin-input">
+                            <option value="fixed">خصم مبلغ ثابت (ريال)</option>
+                            <option value="percent">خصم نسبة مئوية (%)</option>
+                        </select>
+                        <button class="btn" onclick="addNewCoupon()">حفظ كود الخصم</button>
+
+                        <hr style="margin: 20px 0; border:0; border-top:1px solid #222;">
+                        <h4 style="color:#d4af37; margin-bottom:10px;">📋 الأكواد الفعالة</h4>
+                        <div id="adminCouponsList"><p style="color:#777;">لا توجد أكواد مضافة.</p></div>
+                    </div>
+
                     <div id="secAds" class="admin-panel-section">
-                        <h4 style="color:#d4af37; margin-bottom:10px;">📢 نشر إعلان</h4>
+                        <h4 style="color:#d4af37; margin-bottom:10px;">📢 نشر أو حذف الإعلان</h4>
                         <input type="text" id="adTitleInput" class="admin-input" placeholder="عنوان الإعلان">
                         <textarea id="adDescInput" class="admin-input" placeholder="تفاصيل الإعلان..." style="height:60px;"></textarea>
                         <label style="font-size:12px; color:#888; display:block; margin-bottom:5px;">صورة الإعلان:</label>
@@ -312,6 +376,7 @@
                             <option value="banner">إعلان ثابت</option>
                         </select>
                         <button class="btn" onclick="publishAnnouncement()">نشر للجميع</button>
+                        <button class="btn" style="background:#e74c3c; color:#fff; margin-top:10px;" onclick="deleteAnnouncement()">🗑️ حذف الإعلان الحالي</button>
                     </div>
 
                     <div id="secRouting" class="admin-panel-section">
@@ -340,6 +405,9 @@
             </button>
             <button class="nav-item" onclick="switchNavTab('tabRewards', this)">
                 <span class="icon">⭐</span> المكافآت
+            </button>
+            <button class="nav-item" onclick="switchNavTab('tabWallet', this)">
+                <span class="icon">💰</span> المحفظة
             </button>
             <button class="nav-item" onclick="switchNavTab('tabAccount', this)">
                 <span class="icon">👤</span> الحساب
@@ -387,20 +455,22 @@
         let cart = [];
         let allProductsCache = [];
         let allProductsRaw = [];
+        let userPoints = 0;
+        let userWallet = 0;
+        let useRewards = false;
+        let useWallet = false;
+        let activeCoupon = null; // {code, value, type}
+        let availableCoupons = [];
 
-        // متغير للتحكم بتنبيه الطلبات الجديدة وعدم تشغيل الصوت عند فتح التطبيق لأول مرة
         let isInitialOrderLoad = true;
 
-        // دالة توليد صوت تنبيه تفاعلي (مماثل لصوت تطبيقات التوصيل مثل جاهز عبر تقنية Web Audio API)
         function playJahezAlertSound() {
             try {
                 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                
-                // نغمة أولى
                 const osc1 = audioCtx.createOscillator();
                 const gain1 = audioCtx.createGain();
                 osc1.type = 'sine';
-                osc1.frequency.setValueAtTime(587.33, audioCtx.currentTime); // نغمة D5
+                osc1.frequency.setValueAtTime(587.33, audioCtx.currentTime);
                 gain1.gain.setValueAtTime(0.3, audioCtx.currentTime);
                 gain1.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
                 osc1.connect(gain1);
@@ -408,12 +478,11 @@
                 osc1.start();
                 osc1.stop(audioCtx.currentTime + 0.15);
 
-                // نغمة ثانية أعلى (تشبه صوت التنبيه المميز لجاهز)
                 setTimeout(() => {
                     const osc2 = audioCtx.createOscillator();
                     const gain2 = audioCtx.createGain();
                     osc2.type = 'sine';
-                    osc2.frequency.setValueAtTime(880, audioCtx.currentTime); // نغمة A5
+                    osc2.frequency.setValueAtTime(880, audioCtx.currentTime);
                     gain2.gain.setValueAtTime(0.4, audioCtx.currentTime);
                     gain2.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
                     osc2.connect(gain2);
@@ -421,10 +490,7 @@
                     osc2.start();
                     osc2.stop(audioCtx.currentTime + 0.3);
                 }, 120);
-
-            } catch(e) {
-                console.log("Audio context blocked or not supported");
-            }
+            } catch(e) {}
         }
 
         if (currentUser && currentPhone) {
@@ -449,7 +515,7 @@
                 let userRef = doc(db, "users", phone);
                 let userDoc = await getDoc(userRef);
                 if (!userDoc.exists()) {
-                    await setDoc(userRef, { name, phone, points: 0, lastLogin: serverTimestamp() });
+                    await setDoc(userRef, { name, phone, points: 0, wallet: 0, lastLogin: serverTimestamp() });
                 } else {
                     await updateDoc(userRef, { name, lastLogin: serverTimestamp() });
                 }
@@ -466,14 +532,25 @@
             document.getElementById('authScreen').classList.remove('active');
             document.getElementById('appScreen').classList.add('active');
 
-            try {
-                let userDoc = await getDoc(doc(db, "users", currentPhone));
+            // مراقبة بيانات المستخدم الحية (النقاط والمحفظة)
+            onSnapshot(doc(db, "users", currentPhone), (userDoc) => {
                 if (userDoc.exists()) {
-                    let pts = userDoc.data().points || 0;
-                    document.getElementById('myPointsDisplay').innerText = pts + " نقطة";
-                    document.getElementById('accPoints').innerText = pts + " نقطة";
+                    let data = userDoc.data();
+                    userPoints = data.points || 0;
+                    userWallet = data.wallet || 0;
+                    
+                    document.getElementById('myPointsDisplay').innerText = userPoints + " نقطة";
+                    document.getElementById('accPoints').innerText = userPoints + " نقطة";
+                    document.getElementById('myWalletDisplay').innerText = userWallet + " ريال";
+                    document.getElementById('accWallet').innerText = userWallet + " ريال";
+                    
+                    document.getElementById('cartPointsDisplay').innerText = userPoints;
+                    document.getElementById('cartPointsValue').innerText = (userPoints / 10).toFixed(1);
+                    document.getElementById('cartWalletDisplay').innerText = userWallet;
+                    
+                    updateCartUI();
                 }
-            } catch(e) {}
+            });
         }
 
         window.openAdminPanelWithPassword = function() {
@@ -554,7 +631,7 @@
 
         window.deleteProduct = async function(id) {
             if (confirm("هل أنت متأكد من الحذف؟")) {
-                try { await deleteDoc(doc(db, "products", id)); } catch(e) { alert("خطأ بالحذف"); }
+                try { await deleteDoc(doc(db, "products", id)); } catch(e) {}
             }
         }
 
@@ -573,6 +650,17 @@
                 await setDoc(doc(db, "settings", "announcement"), { title, desc, type, img: imgBase64, active: true });
                 alert("تم نشر الإعلان بنجاح!");
             } catch(e) {}
+        }
+
+        // خاصية حذف الإعلان
+        window.deleteAnnouncement = async function() {
+            if (confirm("هل تريد حذف الإعلان الحالي نهائياً؟")) {
+                try {
+                    await setDoc(doc(db, "settings", "announcement"), { active: false });
+                    document.getElementById('activeAdsBanner').style.display = "none";
+                    alert("تم حذف الإعلان بنجاح!");
+                } catch(e) {}
+            }
         }
 
         window.closePopupAd = function() {
@@ -596,8 +684,61 @@
                     document.getElementById('adTitleText').innerText = data.title;
                     document.getElementById('adDescText').innerText = data.desc;
                 }
+            } else {
+                document.getElementById('activeAdsBanner').style.display = "none";
             }
         });
+
+        // إدارة أكواد الخصم
+        window.addNewCoupon = async function() {
+            let code = document.getElementById('couponCodeText').value.trim().toUpperCase();
+            let val = parseFloat(document.getElementById('couponDiscountVal').value) || 0;
+            let type = document.getElementById('couponType').value;
+            if(!code || val <= 0) { alert("أدخل كود صالح وقيمة خصم صحيحة!"); return; }
+            try {
+                await setDoc(doc(db, "coupons", code), { code, value: val, type });
+                alert("تم حفظ كود الخصم بنجاح!");
+                document.getElementById('couponCodeText').value = "";
+                document.getElementById('couponDiscountVal').value = "";
+            } catch(e) {}
+        }
+
+        window.deleteCoupon = async function(code) {
+            try { await deleteDoc(doc(db, "coupons", code)); } catch(e) {}
+        }
+
+        onSnapshot(collection(db, "coupons"), (snapshot) => {
+            availableCoupons = [];
+            let html = "";
+            snapshot.forEach(docSnap => {
+                let c = docSnap.data();
+                availableCoupons.push(c);
+                html += `
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #222; font-size:13px;">
+                        <span><b>${c.code}</b> (${c.value} ${c.type === 'fixed' ? 'ريال' : '%'})</span>
+                        <button class="logout-btn" style="color:#e74c3c;" onclick="deleteCoupon('${c.code}')">حذف</button>
+                    </div>
+                `;
+            });
+            document.getElementById('adminCouponsList').innerHTML = html || "<p style='color:#777;'>لا توجد أكواد مضافة.</p>";
+        });
+
+        window.applyCouponCode = function() {
+            let codeInput = document.getElementById('couponCodeInput').value.trim().toUpperCase();
+            let found = availableCoupons.find(c => c.code === codeInput);
+            let msg = document.getElementById('couponMsg');
+            if (found) {
+                activeCoupon = found;
+                msg.style.color = "#27ae60";
+                msg.innerText = "تم تطبيق الكود بنجاح! خصم " + found.value + (found.type === 'fixed' ? ' ريال' : '%');
+                updateCartUI();
+            } else {
+                activeCoupon = null;
+                msg.style.color = "#e74c3c";
+                msg.innerText = "كود الخصم غير صحيح أو منتهي.";
+                updateCartUI();
+            }
+        }
 
         onSnapshot(collection(db, "products"), (snapshot) => {
             allProductsCache = [];
@@ -690,6 +831,21 @@
             updateCartUI();
         }
 
+        // تشغيل وإيقاف استخدام المكافآت والمحفظة
+        window.toggleRewardsUsage = function(status) {
+            useRewards = status;
+            document.getElementById('btnEnablePoints').style.background = status ? '#27ae60' : '#444';
+            document.getElementById('btnDisablePoints').style.background = !status ? '#e74c3c' : '#444';
+            updateCartUI();
+        }
+
+        window.toggleWalletUsage = function(status) {
+            useWallet = status;
+            document.getElementById('btnEnableWallet').style.background = status ? '#27ae60' : '#444';
+            document.getElementById('btnDisableWallet').style.background = !status ? '#e74c3c' : '#444';
+            updateCartUI();
+        }
+
         function updateCartUI() {
             let totalQty = cart.reduce((sum, i) => sum + i.qty, 0);
             let badge = document.getElementById('cartBadge');
@@ -705,10 +861,10 @@
             }
 
             let html = "";
-            let totalPrice = 0;
+            let subtotal = 0;
             cart.forEach(i => {
                 let sub = i.price * i.qty;
-                totalPrice += sub;
+                subtotal += sub;
                 html += `
                     <div class="cart-item-row">
                         <div style="display:flex; align-items:center; gap:8px;">
@@ -724,7 +880,43 @@
                 `;
             });
             container.innerHTML = html;
-            document.getElementById('cartTotalPriceText').innerText = "المبلغ الإجمالي للمنتجات: " + totalPrice + " ريال";
+
+            let discount = 0;
+            if (activeCoupon) {
+                if (activeCoupon.type === 'fixed') {
+                    discount += activeCoupon.value;
+                } else {
+                    discount += (subtotal * activeCoupon.value) / 100;
+                }
+            }
+
+            let pointsDiscount = 0;
+            if (useRewards && userPoints > 0) {
+                pointsDiscount = userPoints / 10;
+                if (pointsDiscount > (subtotal - discount)) pointsDiscount = Math.max(0, subtotal - discount);
+            }
+
+            let walletDiscount = 0;
+            if (useWallet && userWallet > 0) {
+                walletDiscount = userWallet;
+                let remainingAfterPoints = Math.max(0, subtotal - discount - pointsDiscount);
+                if (walletDiscount > remainingAfterPoints) walletDiscount = remainingAfterPoints;
+            }
+
+            let finalTotal = Math.max(0, subtotal - discount - pointsDiscount - walletDiscount);
+
+            document.getElementById('cartSubtotalText').innerText = "مجموع المنتجات: " + subtotal + " ريال";
+            
+            let discTextElem = document.getElementById('cartDiscountText');
+            let totalDisc = discount + pointsDiscount + walletDiscount;
+            if (totalDisc > 0) {
+                discTextElem.style.display = "block";
+                discTextElem.innerText = "إجمالي الخصومات المطبقة: -" + totalDisc.toFixed(1) + " ريال";
+            } else {
+                discTextElem.style.display = "none";
+            }
+
+            document.getElementById('cartTotalPriceText').innerText = "المبلغ الإجمالي النهائي: " + finalTotal.toFixed(1) + " ريال";
             checkoutSec.style.display = "block";
         }
 
@@ -735,32 +927,59 @@
 
             if (!location || !phone) { alert("أدخل العنوان ورقم الجوال!"); return; }
 
-            let totalPrice = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
+            let subtotal = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
+            let discount = 0;
+            if (activeCoupon) {
+                if (activeCoupon.type === 'fixed') discount = activeCoupon.value;
+                else discount = (subtotal * activeCoupon.value) / 100;
+            }
+
+            let pointsUsedDiscount = 0;
+            let pointsToDeduct = 0;
+            if (useRewards && userPoints > 0) {
+                pointsToDeduct = userPoints;
+                pointsDiscount = userPoints / 10;
+            }
+
+            let walletUsedDiscount = 0;
+            let walletToDeduct = 0;
+            if (useWallet && userWallet > 0) {
+                let rem = Math.max(0, subtotal - discount - (useRewards ? (userPoints/10) : 0));
+                walletUsedDiscount = Math.min(userWallet, rem);
+                walletToDeduct = walletUsedDiscount;
+            }
+
+            let finalTotal = Math.max(0, subtotal - discount - (useRewards ? (userPoints/10) : 0) - walletUsedDiscount);
 
             try {
                 await addDoc(collection(db, "orders"), {
                     customerName: currentUser,
                     customerPhone: phone,
-                    location, notes, items: cart, totalPrice,
+                    location, notes, items: cart, totalPrice: finalTotal,
                     deliveryFee: 0, 
                     status: "قيد المراجعة 🕒",
                     createdAt: serverTimestamp()
                 });
 
-                let earnedPoints = Math.floor(totalPrice / 10);
+                // تحديث نقاط ورصيد المحفظة للمستخدم (خصم المستخدم إذا استخدم مكافأته أو محفظته، أو إضافة نقاط جديدة للطلب)
+                let earnedPoints = Math.floor(finalTotal / 10);
+                let newPoints = (useRewards ? 0 : userPoints) + earnedPoints;
+                let newWallet = userWallet - walletToDeduct;
+
                 let userRef = doc(db, "users", currentPhone);
-                let userSnap = await getDoc(userRef);
-                let currentPts = userSnap.exists() ? (userSnap.data().points || 0) : 0;
-                await updateDoc(userRef, { points: currentPts + earnedPoints });
+                await updateDoc(userRef, { points: newPoints, wallet: newWallet });
 
                 alert("تم إرسال الطلب بنجاح!");
                 cart = [];
+                useRewards = false;
+                useWallet = false;
+                activeCoupon = null;
                 updateCartUI();
                 switchNavTab('tabHistory', document.querySelectorAll('.bottom-nav .nav-item')[2]);
             } catch(e) { alert("حدث خطأ أثناء الإرسال."); }
         }
 
-        // جلب الطلبات مرتبة تنازلياً حسب الوقت (الأحدث أولاً) مع تفعيل صوت التنبيه للطلبات الجديدة
+        // جلب الطلبات مرتبة تنازلياً مع صوت التنبيه للطلبات الجديدة
         const ordersQuery = query(collection(db, "orders"), orderBy("createdAt", "desc"));
 
         onSnapshot(ordersQuery, (snapshot) => {
@@ -769,7 +988,6 @@
             let adminRoutingHtml = "";
             let myOrders = [];
 
-            // فحص هل هناك طلبات جديدة أضيفت بعد فتح التطبيق لتشغيل صوت التنبيه
             if (!isInitialOrderLoad && snapshot.docChanges()) {
                 let hasNewAddedOrder = snapshot.docChanges().some(change => change.type === "added");
                 if (hasNewAddedOrder) {
@@ -822,7 +1040,6 @@
                         </div>
 
                         <div style="background: #1f1a05; border: 1px solid #d4af37; padding: 10px; border-radius: 6px; margin: 10px 0;">
-                            <p style="font-size:12px; color:#ccc;">مجموع المنتجات: ${order.totalPrice || 0} ريال</p>
                             <div style="display:flex; align-items:center; gap:8px; margin-top:8px;">
                                 <label style="font-size:12px; color:#d4af37; font-weight:bold;">قيمة التوصيل (ريال):</label>
                                 <input type="number" id="deliveryFeeInput_${order.id}" class="admin-input" style="margin-bottom:0; width:90px; padding:5px;" value="${deliveryFeeVal}" placeholder="0">
@@ -844,7 +1061,6 @@
                         <div class="order-card" style="border: 1px solid #222; border-right: 5px solid #d4af37; box-shadow: none;">
                             <p><b>رقم الطلب:</b> ${order.id.slice(0,6).toUpperCase()}</p>
                             <div style="margin: 8px 0;">${productsDetailsHtml}</div>
-                            <p><b>سعر المنتجات:</b> ${order.totalPrice || 0} ريال</p>
                             <p><b>قيمة التوصيل:</b> ${deliveryFeeVal} ريال</p>
                             <p style="color:#27ae60; font-weight:bold;"><b>الإجمالي النهائي:</b> ${finalTotal} ريال</p>
                             <p style="margin-top:5px;"><b>الحالة:</b> <span class="status-badge">${order.status || 'قيد المراجعة'}</span></p>
@@ -876,28 +1092,64 @@
             try {
                 await updateDoc(doc(db, "orders", orderId), { deliveryFee: feeValue });
                 alert("تم تحديث وحفظ قيمة التوصيل بنجاح!");
-            } catch(e) {
-                alert("حدث خطأ أثناء حفظ قيمة التوصيل.");
-            }
+            } catch(e) {}
         }
 
         window.updateOrderStatus = async function(orderId, newStatus) {
             try { await updateDoc(doc(db, "orders", orderId), { status: newStatus }); } catch(e) {}
         }
 
+        // إدارة العملاء والنقاط والمحفظة من لوحة الأدمن (إضافة نقاط أو رصيد تعويضات وهدايا)
         onSnapshot(collection(db, "users"), (snapshot) => {
             let usersHtml = "";
             snapshot.forEach(docSnap => {
                 let u = docSnap.data();
+                let uId = docSnap.id;
                 usersHtml += `
-                    <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #222; font-size:13px;">
-                        <span><b>${u.name || 'بدون اسم'}</b> (${u.phone || 'بدون رقم'})</span>
-                        <span style="color:#d4af37; font-weight:bold;">${u.points || 0} نقطة</span>
+                    <div style="background:#1a1a1a; padding:10px; border-radius:8px; margin-bottom:10px; border:1px solid #333; font-size:13px;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                            <b>${u.name || 'بدون اسم'}</b> (${u.phone || ''})
+                        </div>
+                        <div style="display:flex; gap:10px; margin-bottom:8px; font-size:12px;">
+                            <span style="color:#d4af37;">النقاط: ${u.points || 0}</span>
+                            <span style="color:#27ae60;">المحفظة: ${u.wallet || 0} ريال</span>
+                        </div>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                            <input type="number" id="addPts_${uId}" class="admin-input" style="width:70px; margin-bottom:0; padding:4px;" placeholder="نقاط">
+                            <button class="logout-btn" style="background:#d4af37; color:#0b0b0b; font-weight:bold;" onclick="modifyUserPoints('${uId}', document.getElementById('addPts_${uId}').value)">إضافة نقاط</button>
+                            
+                            <input type="number" id="addWallet_${uId}" class="admin-input" style="width:70px; margin-bottom:0; padding:4px;" placeholder="ريال">
+                            <button class="logout-btn" style="background:#27ae60; color:#fff; font-weight:bold;" onclick="modifyUserWallet('${uId}', document.getElementById('addWallet_${uId}').value)">إضافة للمحفظة (تعويض/هدية)</button>
+                        </div>
                     </div>
                 `;
             });
             document.getElementById('adminUsersList').innerHTML = usersHtml || "<p style='color:#777;'>لا توجد بيانات عملاء.</p>";
         });
+
+        window.modifyUserPoints = async function(phone, ptsVal) {
+            let val = parseInt(ptsVal);
+            if (isNaN(val)) return;
+            try {
+                let userRef = doc(db, "users", phone);
+                let docSnap = await getDoc(userRef);
+                let current = docSnap.exists() ? (docSnap.data().points || 0) : 0;
+                await updateDoc(userRef, { points: Math.max(0, current + val) });
+                alert("تم تحديث النقاط بنجاح!");
+            } catch(e) {}
+        }
+
+        window.modifyUserWallet = async function(phone, walletVal) {
+            let val = parseFloat(walletVal);
+            if (isNaN(val)) return;
+            try {
+                let userRef = doc(db, "users", phone);
+                let docSnap = await getDoc(userRef);
+                let current = docSnap.exists() ? (docSnap.data().wallet || 0) : 0;
+                await updateDoc(userRef, { wallet: Math.max(0, current + val) });
+                alert("تم تحديث رصيد المحفظة بنجاح!");
+            } catch(e) {}
+        }
     </script>
 </body>
 </html>
