@@ -1,5 +1,5 @@
 window.addEventListener('load', () => {
-    // التحقق إذا كان الجهاز آيفون وليس محمشاً داخل التطبيق مسبقاً
+    // التحقق إذا كان الجهاز آيفون وليس مشغلاً كـ تطبيق مستقل مسبقاً
     const isIos = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
     const isInStandaloneMode = ('standalone' in window.navigator) && (window.navigator.standalone);
 
