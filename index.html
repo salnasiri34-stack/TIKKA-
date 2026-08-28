@@ -644,7 +644,6 @@
             let totalPrice = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
 
             try {
-                // إرسال الطلب مباشرة ومحفوظ بدقة
                 await addDoc(collection(db, "orders"), {
                     customerName: currentUser,
                     customerPhone: phone,
@@ -676,7 +675,7 @@
             }
         }
 
-        // الاستماع المباشر للطلبات بدون شروط معقدة لضمان ظهورها عندك فوراً
+        // استعلام مباشر ومبسط جداً لجلب الطلبات بدون مشاكل الفهرسة
         onSnapshot(collection(db, "orders"), (snapshot) => {
             let historyHtml = "";
             let adminOrdersHtml = "";
