@@ -1,818 +1,413 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <link rel="apple-touch-icon" href="https://images.unsplash.com/photo-1555939594-58d7cb561ad1">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="تكة | Tikka">
-    <link rel="icon" type="image/png" href="https://images.unsplash.com/photo-1555939594-58d7cb561ad1">
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تكة | Tikka - التطبيق الاحترافي المتكامل</title>
+    <title>تكة ماركت - نظام الطلبات</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Tahoma, sans-serif; }
-        body { background-color: #f8f9fa; color: #333; padding-bottom: 90px; }
+        :root {
+            --primary: #2e7d32;
+            --primary-light: #4caf50;
+            --accent: #ff9800;
+            --bg: #f4f6f8;
+            --card-bg: #ffffff;
+            --text: #333333;
+            --gray: #777777;
+        }
 
-        header { background-color: #ffffff; border-bottom: 1px solid #e0e0e0; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
-        .logo-area { display: flex; align-items: center; gap: 12px; }
-        .logo-img { width: 42px; height: 42px; border-radius: 50%; border: 2px solid #d4af37; object-fit: cover; }
-        .logo-title { font-size: 20px; font-weight: bold; color: #b8860b; }
-        
-        .user-panel { display: flex; align-items: center; gap: 12px; }
-        .logout-btn { background: #f1f2f6; border: 1px solid #d4af37; color: #b8860b; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-        .container { max-width: 1000px; margin: 20px auto; padding: 0 15px; }
-        .screen { display: none; }
-        .screen.active { display: block; }
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            padding: 20px;
+        }
 
-        .auth-box { background: #ffffff; border: 1px solid #e0e0e0; max-width: 400px; margin: 60px auto; padding: 35px; border-radius: 16px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-        .auth-box img { width: 75px; height: 75px; border-radius: 50%; border: 2px solid #d4af37; margin-bottom: 15px; object-fit: cover; }
-        .auth-box h2 { color: #b8860b; margin-bottom: 20px; }
-        .auth-input { width: 100%; padding: 12px; margin-bottom: 15px; background: #fdfdfd; border: 1px solid #ccc; color: #333; border-radius: 8px; font-size: 15px; outline: none; }
-        .auth-btn { width: 100%; background: #d4af37; color: #ffffff; border: none; padding: 12px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            overflow: hidden;
+            padding: 20px;
+        }
 
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #ffffff; border-top: 1px solid #e0e0e0; display: flex; justify-content: space-around; padding: 10px 0; z-index: 1000; box-shadow: 0 -2px 10px rgba(0,0,0,0.03); }
-        .nav-item { background: none; border: none; color: #777; font-size: 12px; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; position: relative; }
-        .nav-item.active { color: #b8860b; font-weight: bold; }
-        .nav-item span.icon { font-size: 20px; }
-        .cart-badge { position: absolute; top: -2px; right: 28%; background: #e74c3c; color: white; border-radius: 50%; padding: 1px 6px; font-size: 10px; font-weight: bold; display: none; }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
 
-        .ads-banner { background: linear-gradient(135deg, #fffcf0, #fff5d1); border: 1px solid #e6ca65; padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: center; box-shadow: 0 4px 10px rgba(212,175,55,0.05); }
-        .ads-banner h3 { color: #b8860b; margin-bottom: 5px; font-size: 16px; }
-        .ads-banner p { font-size: 13px; color: #555; }
+        .view {
+            display: none;
+        }
+        .view.active {
+            display: block;
+        }
 
-        .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 2000; padding: 20px; }
-        .popup-card { background: #ffffff; width: 100%; max-width: 380px; border-radius: 16px; padding: 25px; text-align: center; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.2); border: 1px solid #d4af37; }
-        .popup-close-btn { position: absolute; top: 12px; left: 12px; background: #f1f2f6; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 16px; font-weight: bold; cursor: pointer; color: #333; display: flex; align-items: center; justify-content: center; }
-        .popup-img { width: 100%; height: 160px; object-fit: cover; border-radius: 10px; margin-bottom: 12px; background: #f0f0f0; }
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
 
-        .sub-tabs { display: flex; gap: 10px; margin-bottom: 15px; }
-        .sub-tab-btn { background: #ffffff; border: 1px solid #ccc; color: #555; padding: 8px 18px; border-radius: 20px; font-size: 13px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
-        .sub-tab-btn.active { background: #d4af37; color: #ffffff; border-color: #d4af37; font-weight: bold; }
+        .category-card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
 
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
-        .card { background: #ffffff; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.03); position: relative; }
-        .card img { width: 100%; height: 140px; object-fit: cover; background: #f0f0f0; }
-        .card-body { padding: 12px; }
-        .card-title { font-size: 16px; font-weight: bold; color: #222; margin-bottom: 4px; }
-        .card-desc { font-size: 12px; color: #666; margin-bottom: 8px; }
-        
-        .price-box { margin-bottom: 8px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-        .price { font-weight: bold; color: #b8860b; font-size: 15px; }
-        .old-price { text-decoration: line-through; color: #999; font-size: 12px; }
-        .sale-badge { background: #e74c3c; color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+        .category-card:hover, .category-card.selected {
+            border-color: var(--primary-light);
+            transform: translateY(-3px);
+        }
 
-        .btn { width: 100%; background-color: #d4af37; color: #ffffff; border: none; padding: 8px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .btn.out-of-stock { background-color: #95a5a6; cursor: not-allowed; }
+        .category-img-container {
+            width: 100%;
+            height: 110px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #f9f9f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
 
-        /* سلة المشتريات */
-        .cart-item-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; font-size: 13px; }
-        .qty-controls { display: flex; align-items: center; gap: 8px; }
-        .qty-btn { background: #f1f2f6; border: 1px solid #ccc; width: 26px; height: 26px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        .cart-summary-box { background: #fffcf0; border: 1px solid #d4af37; padding: 15px; border-radius: 10px; margin-top: 15px; }
+        .category-img-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
 
-        .admin-trigger-btn { width: 100%; background: linear-gradient(135deg, #d4af37, #b8860b); color: #ffffff; border: none; padding: 15px; border-radius: 10px; font-size: 16px; font-weight: 900; cursor: pointer; text-align: center; margin-top: 15px; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2); }
+        .category-card span {
+            font-weight: bold;
+            font-size: 16px;
+            color: var(--text);
+        }
 
-        .admin-sections-nav { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
-        .admin-sec-btn { background: #ffffff; border: 1px solid #d4af37; color: #b8860b; padding: 8px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; white-space: nowrap; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        .admin-sec-btn.active { background: #d4af37; color: #ffffff; font-weight: bold; }
-        .admin-panel-section { display: none; background: #ffffff; border: 1px solid #e0e0e0; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
-        .admin-panel-section.active { display: block; }
-        .admin-input { width: 100%; padding: 10px; background: #fafafa; border: 1px solid #ddd; color: #333; border-radius: 6px; margin-bottom: 10px; font-size: 13px; }
+        .products-list {
+            margin-bottom: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
 
-        .order-card { background: #ffffff; border: 1px solid #e0e0e0; padding: 15px; border-radius: 10px; margin-bottom: 12px; border-right: 5px solid #d4af37; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
-        .status-badge { background: #fff8e1; color: #b8860b; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: bold; display: inline-block; border: 1px solid #ffe082; }
+        .product-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fafafa;
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #eee;
+        }
 
-        footer { text-align: center; padding: 15px; font-size: 12px; color: #666; background: #ffffff; border-top: 1px solid #e0e0e0; margin-top: 30px; }
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--primary-light);
+        }
+
+        .btn-accent {
+            background: var(--accent);
+        }
+        .btn-accent:hover {
+            background: #f57c00;
+        }
+
+        .cart-section {
+            background: #fdfdfd;
+            border-top: 2px dashed #ddd;
+            padding-top: 15px;
+            margin-top: 15px;
+        }
+
+        .cart-items {
+            max-height: 150px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+        }
+
+        .cart-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .total-price {
+            font-weight: bold;
+            font-size: 18px;
+            text-align: left;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+
+        .status-box {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .order-id-tag {
+            font-size: 20px;
+            color: var(--gray);
+            margin-bottom: 15px;
+            background: #eee;
+            display: inline-block;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .status-badge {
+            font-size: 22px;
+            font-weight: bold;
+            padding: 12px 25px;
+            border-radius: 30px;
+            display: inline-block;
+            margin: 15px 0;
+        }
+
+        .status-preparing { background: #fff3e0; color: #e65100; }
+        .status-ready { background: #e8f5e9; color: #2e7d32; }
+        .status-delivered { background: #e3f2fd; color: #1565c0; }
+
+        .admin-controls {
+            margin-top: 25px;
+            background: #f1f3f5;
+            padding: 15px;
+            border-radius: 12px;
+        }
+
+        .admin-controls h4 {
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        .admin-btns {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
     </style>
 </head>
 <body>
 
-    <div id="popupOverlay" class="popup-overlay">
-        <div class="popup-card">
-            <button class="popup-close-btn" onclick="closePopupAd()">×</button>
-            <img id="popupImgTag" class="popup-img" src="" style="display:none;">
-            <h3 id="popupTitleText" style="color: #b8860b; margin-bottom: 8px; font-size: 18px;">تنبيه مهم</h3>
-            <p id="popupDescText" style="color: #555; font-size: 13px; line-height: 1.5;">...</p>
+<div class="container">
+    <!-- Main Menu View -->
+    <div id="menuView" class="view active">
+        <h2>تكة ماركت - القائمة الرئيسية</h2>
+        
+        <div class="categories-grid">
+            <div class="category-card" onclick="filterCategory('market')">
+                <div class="category-img-container">
+                    <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%234caf50'/><text x='50' y='55' font-size='40' text-anchor='middle' fill='white'>🛒</text></svg>" alt="كيمارت">
+                </div>
+                <span>كيمارت</span>
+            </div>
+            <div class="category-card" onclick="filterCategory('coffee')">
+                <div class="category-img-container">
+                    <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23795548'/><text x='50' y='55' font-size='40' text-anchor='middle' fill='white'>☕</text></svg>" alt="المشروبات الساخنة">
+                </div>
+                <span>المشروبات الساخنة</span>
+            </div>
+        </div>
+
+        <div class="products-list" id="productsList">
+            <!-- المنتجات تظهر هنا تلقائياً -->
+        </div>
+
+        <div class="cart-section">
+            <h3>سلة الطلبات</h3>
+            <div class="cart-items" id="cartItems">
+                <p style="color: var(--gray); text-align: center; font-size: 14px;">السلة فارغة</p>
+            </div>
+            <div class="total-price">المجموع: <span id="totalPrice">0</span> ر.س</div>
+            <button class="btn btn-accent" style="width: 100%; padding: 12px;" onclick="checkout()">إتمام الطلب</button>
         </div>
     </div>
 
-    <div id="authScreen" class="screen active">
-        <div class="auth-box">
-            <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1" onerror="this.style.display='none'">
-            <h2>تكة | Tikka</h2>
-            <p style="color: #666; font-size: 13px; margin-bottom: 20px;">تطبيق التوصيل الذكي والمميز</p>
-            <input type="text" id="userName" class="auth-input" placeholder="اسمك الكريم">
-            <input type="tel" id="userPhone" class="auth-input" placeholder="رقم الجوال">
-            <button class="auth-btn" onclick="login()">دخول التطبيق</button>
+    <!-- Order Status View -->
+    <div id="statusView" class="view">
+        <div class="status-box">
+            <h2>حالة الطلب</h2>
+            <div class="order-id-tag" id="displayOrderId">TK-00000</div>
+            <div>
+                <div id="currentStatusBadge" class="status-badge status-preparing">قيد التجهيز</div>
+            </div>
+            <p id="statusDesc" style="color: var(--gray); margin-bottom: 20px;">جاري تجهيز طلبك الآن بعناية...</p>
+
+            <div class="admin-controls">
+                <h4>لوحة التحكم (تغيير حالة الطلب):</h4>
+                <div class="admin-btns">
+                    <button class="btn" style="background:#e65100; font-size: 12px;" onclick="changeStatus('preparing')">تجهيز الطلب</button>
+                    <button class="btn" style="background:#2e7d32; font-size: 12px;" onclick="changeStatus('ready')">جاهز للاستلام</button>
+                    <button class="btn" style="background:#1565c0; font-size: 12px;" onclick="changeStatus('delivered')">تم التسليم</button>
+                </div>
+            </div>
+
+            <button class="btn" style="margin-top: 25px; width: 100%; background: #607d8b;" onclick="resetApp()">طلب جديد</button>
         </div>
     </div>
+</div>
 
-    <div id="appScreen" class="screen">
-        <header>
-            <div class="logo-area">
-                <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1" class="logo-img" onerror="this.style.display='none'">
-                <div class="logo-title">تكة | Tikka 🛵</div>
-            </div>
-            <div class="user-panel">
-                <span id="welcomeUser" style="font-weight: bold; color: #b8860b; font-size: 13px;"></span>
-                <button class="logout-btn" onclick="logout()">خروج</button>
-            </div>
-        </header>
+<script>
+    // قاعدة بيانات المنتجات الافتراضية مع الحفظ في الذاكرة الدائمة (localStorage)
+    let defaultProducts = {
+        market: [
+            { id: 1, name: 'حليب المراعي', price: 7 },
+            { id: 2, name: 'بسكويت شوكولاتة', price: 3 },
+            { id: 3, name: 'مياه معدنية', price: 1 }
+        ],
+        coffee: [
+            { id: 4, name: 'لاتيه حار', price: 18 },
+            { id: 5, name: 'كابتشينو', price: 16 },
+            { id: 6, name: 'قهوة تركي', price: 12 }
+        ]
+    };
 
-        <div class="container">
-            
-            <div id="appMessageBox" style="display:none; background: #fffcf0; border: 1px solid #d4af37; padding: 12px; border-radius: 10px; margin-bottom: 15px; text-align: center;">
-                <span style="color: #b8860b; font-weight: bold; font-size: 13px;" id="adminMsgText">رسالة جديدة من الإدارة</span>
-            </div>
+    // استرجاع المنتجات من الذاكرة أو حفظها لو أول مرة تشتغل
+    if (!localStorage.getItem('store_products')) {
+        localStorage.setItem('store_products', JSON.stringify(defaultProducts));
+    }
+    let products = JSON.parse(localStorage.getItem('store_products'));
 
-            <div id="tabHome" class="screen active">
-                <div id="activeAdsBanner" class="ads-banner" style="display:none;">
-                    <h3 id="adTitleText">العرض الترويجي</h3>
-                    <p id="adDescText">تفاصيل العرض هنا...</p>
+    let cart = JSON.parse(localStorage.getItem('store_cart')) || [];
+    let currentOrderId = localStorage.getItem('store_order_id') || '';
+
+    // عرض المنتجات حسب الفئة المحددة
+    function filterCategory(category) {
+        const list = document.getElementById('productsList');
+        list.innerHTML = '';
+        
+        if (!products[category] || products[category].length === 0) {
+            list.innerHTML = `<p style="text-align:center; color:var(--gray); padding:10px;">لا توجد منتجات مضافة هنا حالياً</p>`;
+            return;
+        }
+
+        products[category].forEach(prod => {
+            list.innerHTML += `
+                <div class="product-item">
+                    <span>${prod.name} (${prod.price} ر.س)</span>
+                    <button class="btn" onclick="addToCart('${prod.name}', ${prod.price})">إضافة</button>
                 </div>
-
-                <div class="sub-tabs">
-                    <button class="sub-tab-btn active" onclick="switchCategory('meals', this)">🍔 الوجبات الساخنة</button>
-                    <button class="sub-tab-btn" onclick="switchCategory('market', this)">🛒 تكة ماركت</button>
-                </div>
-
-                <div id="catalogGrid" class="grid"><p style="color:#777;">جاري التحميل...</p></div>
-            </div>
-
-            <div id="tabCart" class="screen">
-                <h2 style="margin-bottom: 15px; color: #333; font-size: 18px;">سلة المشتريات 🛒</h2>
-                <div id="cartItemsContainer"><p style="color: #777;">السلة فارغة حالياً.</p></div>
-                
-                <div id="cartCheckoutSection" style="display:none; margin-top: 20px; background: #fff; border: 1px solid #e0e0e0; padding: 20px; border-radius: 12px;">
-                    <h3 style="color: #b8860b; margin-bottom: 12px; font-size: 16px;">تفاصيل وموقع التوصيل 📍</h3>
-                    <input type="text" id="deliveryLocation" class="admin-input" placeholder="عنوان التوصيل بالتفصيل (الحي، الشارع، رقم البناية)">
-                    <input type="tel" id="deliveryPhone" class="admin-input" placeholder="رقم الجوال للتواصل">
-                    <textarea id="deliveryNotes" class="admin-input" placeholder="ملاحظات إضافية للطلب (اختياري)..." style="height:60px;"></textarea>
-
-                    <div class="cart-summary-box">
-                        <p style="font-size:14px; font-weight:bold; color:#b8860b;" id="cartTotalPriceText">المبلغ الإجمالي: 0 ريال</p>
-                    </div>
-
-                    <button class="btn" style="margin-top: 15px; background-color: #27ae60;" onclick="checkoutCart()">إتمام وإرسال الطلب نهائياً 🛵</button>
-                </div>
-            </div>
-
-            <div id="tabHistory" class="screen">
-                <h2 style="margin-bottom: 15px; color: #333; font-size: 18px;">سجل طلباتك السابقة وإثباتات التوصيل 📦</h2>
-                <div id="historyContainer"><p style="color: #777;">لا توجد طلبات سابقة.</p></div>
-            </div>
-
-            <div id="tabRewards" class="screen">
-                <div style="background: #ffffff; border: 1px solid #e0e0e0; padding: 25px; border-radius: 15px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.02);">
-                    <h2 style="color: #b8860b; margin-bottom: 10px;">نظام نقاط ولاء تكة ⭐</h2>
-                    <p style="color: #666; font-size: 13px; margin-bottom: 15px;">اجمع النقاط مع كل طلب واستخدمها لخصم قيمة طلباتك القادمة!</p>
-                    <div style="font-size: 30px; font-weight: bold; color: #b8860b;" id="myPointsDisplay">0 نقطة</div>
-                    <p style="font-size: 11px; color: #888; margin-top: 5px;">كل 10 نقاط تساوي خصم ريال واحد.</p>
-                </div>
-            </div>
-
-            <div id="tabAccount" class="screen">
-                <div style="background: #ffffff; border: 1px solid #e0e0e0; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.02);">
-                    <h2 style="color: #b8860b; margin-bottom: 15px; font-size: 18px;">معلومات الحساب الشخصي 👤</h2>
-                    <p style="margin-bottom: 10px; color:#555;">الاسم: <strong id="accName" style="color:#222;">-</strong></p>
-                    <p style="margin-bottom: 10px; color:#555;">رقم الجوال: <strong id="accPhone" style="color:#222;">-</strong></p>
-                    <p style="margin-bottom: 10px; color:#555;">رصيد النقاط: <strong id="accPoints" style="color:#b8860b;">0 نقطة</strong></p>
-                </div>
-
-                <button class="admin-trigger-btn" onclick="openAdminPanelWithPassword()">🔑 لوحة تحكم الأدمن (الرمز السري)</button>
-
-                <div id="adminPanelWrapper" style="display:none; margin-top: 25px;">
-                    <h3 style="color: #b8860b; margin-bottom: 12px; font-size: 18px; font-weight: 900;">⚙️ لوحة تحكم الأدمن</h3>
-                    
-                    <div class="admin-sections-nav">
-                        <button class="admin-sec-btn active" onclick="switchAdminSub('secProducts', this)">إدارة المنتجات</button>
-                        <button class="admin-sec-btn" onclick="switchAdminSub('secOrders', this)">متابعة الطلبات</button>
-                        <button class="admin-sec-btn" onclick="switchAdminSub('secUsers', this)">إدارة العملاء</button>
-                        <button class="admin-sec-btn" onclick="switchAdminSub('secAds', this)">الإعلانات المهمة</button>
-                        <button class="admin-sec-btn" onclick="switchAdminSub('secRouting', this)" style="background:#27ae60; color:#fff;">التوجيه (واتساب 🟢)</button>
-                    </div>
-
-                    <div id="secProducts" class="admin-panel-section active">
-                        <h4 style="color:#b8860b; margin-bottom:10px;">➕ إضافة منتج جديد (مع العروض والمخزون)</h4>
-                        <input type="text" id="pName" class="admin-input" placeholder="اسم المنتج">
-                        <input type="text" id="pPrice" class="admin-input" placeholder="السعر الأساسي (مثلاً: 45)">
-                        <input type="text" id="pOldPrice" class="admin-input" placeholder="سعر العرض/قبل الخصم (اختياري - مثلاً: 60)">
-                        
-                        <select id="pCategory" class="admin-input">
-                            <option value="meals">وجبات ساخنة</option>
-                            <option value="market">تكة ماركت</option>
-                        </select>
-
-                        <select id="pStockStatus" class="admin-input">
-                            <option value="available">متوفر في المخزون ✅</option>
-                            <option value="out">نفد من المخزون ❌</option>
-                        </select>
-
-                        <label style="font-size:12px; color:#666; display:block; margin-bottom:5px;">اختر صورة المنتج من المعرض:</label>
-                        <input type="file" id="pImageFile" class="admin-input" accept="image/*">
-                        <textarea id="pDesc" class="admin-input" placeholder="وصف المنتج..." style="height:50px;"></textarea>
-                        <button class="btn" onclick="addNewProduct()">إضافة للقائمة</button>
-                        
-                        <hr style="margin: 20px 0; border:0; border-top:1px solid #eee;">
-                        <h4 style="color:#b8860b; margin-bottom:10px;">🗑️ قائمة المنتجات للحذف أو التعديل الفوري</h4>
-                        <div id="adminProductsList"><p style="color:#777;">جاري التحميل...</p></div>
-                    </div>
-
-                    <div id="secOrders" class="admin-panel-section">
-                        <h4 style="color:#b8860b; margin-bottom:10px;">📦 طلبات جميع العملاء الحية</h4>
-                        <div id="adminOrdersList"><p style="color:#777;">جاري التحميل...</p></div>
-                    </div>
-
-                    <div id="secUsers" class="admin-panel-section">
-                        <h4 style="color:#b8860b; margin-bottom:10px;">👥 قائمة كل من سجل في التطبيق والنقاط</h4>
-                        <div id="adminUsersList"><p style="color:#777;">جاري التحميل...</p></div>
-                    </div>
-
-                    <div id="secAds" class="admin-panel-section">
-                        <h4 style="color:#b8860b; margin-bottom:10px;">📢 نشر إعلان أو تنبيه مهم</h4>
-                        <input type="text" id="adTitleInput" class="admin-input" placeholder="عنوان الإعلان">
-                        <textarea id="adDescInput" class="admin-input" placeholder="تفاصيل الإعلان أو التنبيه..." style="height:60px;"></textarea>
-                        <label style="font-size:12px; color:#666; display:block; margin-bottom:5px;">صورة الإعلان من المعرض (اختياري):</label>
-                        <input type="file" id="adImageFile" class="admin-input" accept="image/*">
-                        <select id="adTypeInput" class="admin-input">
-                            <option value="popup">إعلان مهم (منبثق بوجه المستخدم مع زر إغلاق X)</option>
-                            <option value="banner">إعلان ثابت (في أعلى الصفحة)</option>
-                        </select>
-                        <button class="btn" onclick="publishAnnouncement()">نشر الإعلان للجميع</button>
-                    </div>
-
-                    <div id="secRouting" class="admin-panel-section">
-                        <h4 style="color:#27ae60; margin-bottom:10px;">🟢 قائمة التوجيه (مراسلة العملاء عبر واتساب)</h4>
-                        <p style="font-size:12px; color:#666; margin-bottom:12px;">انقر على زر "إرسال واتساب" ليتم تحويلك فوراً لرقم العميل مع رسالة جاهزة (تم إتمام طلبك من تكة).</p>
-                        <div id="adminRoutingList"><p style="color:#777;">جاري التحميل...</p></div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <footer>
-            <p>&copy; 2026 جميع الحقوق محفوظة لصالح سليمان. التطبيق الرسمي.</p>
-        </footer>
-
-        <div class="bottom-nav">
-            <button class="nav-item active" onclick="switchNavTab('tabHome', this)">
-                <span class="icon">🏠</span> الرئيسية
-            </button>
-            <button class="nav-item" onclick="switchNavTab('tabCart', this)">
-                <span class="icon">🛒</span> السلة
-                <span id="cartBadge" class="cart-badge">0</span>
-            </button>
-            <button class="nav-item" onclick="switchNavTab('tabHistory', this)">
-                <span class="icon">📋</span> السجل
-            </button>
-            <button class="nav-item" onclick="switchNavTab('tabRewards', this)">
-                <span class="icon">⭐</span> المكافآت
-            </button>
-            <button class="nav-item" onclick="switchNavTab('tabAccount', this)">
-                <span class="icon">👤</span> الحساب
-            </button>
-        </div>
-    </div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, deleteDoc, onSnapshot, updateDoc, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyCbT5oJoSWA31DDkfuZ1pHmcjjUh_PiLmw",
-            authDomain: "tikka-0.firebaseapp.com",
-            projectId: "tikka-0",
-            storageBucket: "tikka-0.firebasestorage.app",
-            messagingSenderId: "821806366817",
-            appId: "1:821806366817:web:d4e36d26c3eb0d389caa20",
-            measurementId: "G-6BEGNPD4B6"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        let currentUser = localStorage.getItem('tikka_user') || "";
-        let currentPhone = localStorage.getItem('tikka_phone') || "";
-        let currentCategoryFilter = 'meals';
-        let cart = [];
-
-        if (currentUser && currentPhone) {
-            initAppSession();
-        }
-
-        window.login = async function() {
-            let name = document.getElementById('userName').value.trim();
-            let phone = document.getElementById('userPhone').value.trim();
-            if (!name || !phone) {
-                alert("الرجاء إدخال الاسم ورقم الجوال!");
-                return;
-            }
-
-            localStorage.setItem('tikka_user', name);
-            localStorage.setItem('tikka_phone', phone);
-            currentUser = name;
-            currentPhone = phone;
-            document.getElementById('deliveryPhone').value = phone;
-
-            try {
-                let userRef = doc(db, "users", phone);
-                let userDoc = await getDoc(userRef);
-                if (!userDoc.exists()) {
-                    await setDoc(userRef, {
-                        name: name,
-                        phone: phone,
-                        points: 0,
-                        lastLogin: serverTimestamp()
-                    });
-                } else {
-                    await updateDoc(userRef, { name: name, lastLogin: serverTimestamp() });
-                }
-            } catch(e) {}
-
-            initAppSession();
-        }
-
-        async function initAppSession() {
-            document.getElementById('welcomeUser').innerText = "مرحباً، " + currentUser;
-            document.getElementById('accName').innerText = currentUser;
-            document.getElementById('accPhone').innerText = currentPhone;
-            document.getElementById('deliveryPhone').value = currentPhone;
-            document.getElementById('authScreen').classList.remove('active');
-            document.getElementById('appScreen').classList.add('active');
-
-            try {
-                let userDoc = await getDoc(doc(db, "users", currentPhone));
-                if (userDoc.exists()) {
-                    let pts = userDoc.data().points || 0;
-                    document.getElementById('myPointsDisplay').innerText = pts + " نقطة";
-                    document.getElementById('accPoints').innerText = pts + " نقطة";
-                }
-            } catch(e) {}
-        }
-
-        window.openAdminPanelWithPassword = function() {
-            let pass = prompt("أدخل الرمز السري الخاص بلوحة الأدمن:");
-            if (pass === "Ss@10203040") {
-                document.getElementById('adminPanelWrapper').style.display = "block";
-                alert("تم التحقق بنجاح! أهلاً بك في لوحة تحكم الأدمن.");
-            } else if (pass !== null) {
-                alert("الرمز السري غير صحيح!");
-            }
-        }
-
-        window.logout = function() {
-            localStorage.removeItem('tikka_user');
-            localStorage.removeItem('tikka_phone');
-            location.reload();
-        }
-
-        window.switchNavTab = function(tabId, btn) {
-            document.querySelectorAll('#appScreen > .container > .screen').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.bottom-nav .nav-item').forEach(b => b.classList.remove('active'));
-            
-            document.getElementById(tabId).classList.add('active');
-            btn.classList.add('active');
-        }
-
-        window.switchCategory = function(cat, btn) {
-            currentCategoryFilter = cat;
-            document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            loadProductsUI();
-        }
-
-        window.switchAdminSub = function(secId, btn) {
-            document.querySelectorAll('.admin-panel-section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.admin-sec-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(secId).classList.add('active');
-            btn.classList.add('active');
-        }
-
-        function convertFileToBase64(fileInputId) {
-            return new Promise((resolve) => {
-                let fileInput = document.getElementById(fileInputId);
-                if (fileInput.files && fileInput.files[0]) {
-                    let reader = new FileReader();
-                    reader.onload = function(e) { resolve(e.target.result); };
-                    reader.readAsDataURL(fileInput.files[0]);
-                } else {
-                    resolve("https://images.unsplash.com/photo-1555939594-58d7cb561ad1");
-                }
-            });
-        }
-
-        window.addNewProduct = async function() {
-            let name = document.getElementById('pName').value.trim();
-            let price = document.getElementById('pPrice').value.trim();
-            let oldPrice = document.getElementById('pOldPrice').value.trim();
-            let category = document.getElementById('pCategory').value;
-            let stockStatus = document.getElementById('pStockStatus').value;
-            let desc = document.getElementById('pDesc').value.trim();
-            let imgBase64 = await convertFileToBase64('pImageFile');
-
-            if(!name || !price) { alert("أدخل اسم المنتج والسعر الأساسي!"); return; }
-            try {
-                await addDoc(collection(db, "products"), { 
-                    name, 
-                    price: price + " ريال", 
-                    oldPrice: oldPrice ? oldPrice + " ريال" : "", 
-                    category, 
-                    stockStatus, 
-                    img: imgBase64, 
-                    desc 
-                });
-                alert("تم إضافة المنتج بنجاح!");
-                document.getElementById('pName').value = "";
-                document.getElementById('pPrice').value = "";
-                document.getElementById('pOldPrice').value = "";
-                document.getElementById('pDesc').value = "";
-                document.getElementById('pImageFile').value = "";
-            } catch(e) { alert("فشل الإضافة."); }
-        }
-
-        window.deleteProduct = async function(id) {
-            if (confirm("هل أنت متأكد من رغبتك في حذف هذا المنتج نهائياً؟")) {
-                try {
-                    await deleteDoc(doc(db, "products", id));
-                    alert("تم حذف المنتج نهائياً.");
-                } catch(e) {
-                    alert("خطأ أثناء الحذف.");
-                }
-            }
-        }
-
-        window.publishAnnouncement = async function() {
-            let title = document.getElementById('adTitleInput').value.trim();
-            let desc = document.getElementById('adDescInput').value.trim();
-            let type = document.getElementById('adTypeInput').value;
-            let imgBase64 = await convertFileToBase64('adImageFile');
-
-            if(!title) { alert("أدخل عنوان الإعلان!"); return; }
-
-            try {
-                await setDoc(doc(db, "settings", "announcement"), { 
-                    title, desc, type, img: imgBase64, active: true 
-                });
-                alert("تم نشر الإعلان بنجاح للجميع!");
-            } catch(e) { alert("فشل النشر."); }
-        }
-
-        window.closePopupAd = function() {
-            document.getElementById('popupOverlay').style.display = "none";
-        }
-
-        onSnapshot(doc(db, "settings", "announcement"), (docSnap) => {
-            if (docSnap.exists() && docSnap.data().active) {
-                let data = docSnap.data();
-                if (data.type === 'popup') {
-                    document.getElementById('popupTitleText').innerText = data.title;
-                    document.getElementById('popupDescText').innerText = data.desc;
-                    if(data.img) {
-                        let pImg = document.getElementById('popupImgTag');
-                        pImg.src = data.img;
-                        pImg.style.display = "block";
-                    }
-                    document.getElementById('popupOverlay').style.display = "flex";
-                } else if(data.type === 'banner') {
-                    document.getElementById('activeAdsBanner').style.display = "block";
-                    document.getElementById('adTitleText').innerText = data.title;
-                    document.getElementById('adDescText').innerText = data.desc;
-                }
-            }
+            `;
         });
+    }
 
-        let allProductsCache = [];
-        let allProductsRaw = [];
+    function addToCart(name, price) {
+        cart.push({ name, price });
+        saveCart();
+        updateCartUI();
+    }
 
-        onSnapshot(collection(db, "products"), (snapshot) => {
-            allProductsCache = [];
-            allProductsRaw = [];
-            snapshot.forEach(docSnap => {
-                let data = docSnap.data();
-                data.id = docSnap.id;
-                allProductsCache.push(data);
-                allProductsRaw.push(data);
-            });
-            loadProductsUI();
-            loadAdminProductsUI();
+    function saveCart() {
+        localStorage.setItem('store_cart', JSON.stringify(cart));
+    }
+
+    function updateCartUI() {
+        const container = document.getElementById('cartItems');
+        const totalEl = document.getElementById('totalPrice');
+        
+        if (cart.length === 0) {
+            container.innerHTML = `<p style="color: var(--gray); text-align: center; font-size: 14px;">السلة فارغة</p>`;
+            totalEl.innerText = '0';
+            return;
+        }
+
+        container.innerHTML = '';
+        let total = 0;
+        cart.forEach((item) => {
+            total += item.price;
+            container.innerHTML += `
+                <div class="cart-row">
+                    <span>${item.name}</span>
+                    <span>${item.price} ر.س</span>
+                </div>
+            `;
         });
+        totalEl.innerText = total;
+    }
 
-        function loadProductsUI() {
-            let gridHtml = "";
-            let filtered = allProductsCache.filter(p => p.category === currentCategoryFilter);
-            
-            if (filtered.length === 0) {
-                gridHtml = "<p style='color:#777;'>لا توجد منتجات مضافة لهذا القسم حالياً.</p>";
-            } else {
-                filtered.forEach(p => {
-                    let isOutOfStock = p.stockStatus === 'out';
-                    gridHtml += `
-                        <div class="card">
-                            <img src="${p.img}">
-                            <div class="card-body">
-                                <div class="card-title">${p.name}</div>
-                                <div class="card-desc">${p.desc || 'منتج طازج ومميز'}</div>
-                                <div class="price-box">
-                                    <span class="price">${p.price}</span>
-                                    ${p.oldPrice ? `<span class="old-price">${p.oldPrice}</span><span class="sale-badge">عرض خصم 🔥</span>` : ''}
-                                </div>
-                                <button class="btn ${isOutOfStock ? 'out-of-stock' : ''}" ${isOutOfStock ? 'disabled' : ''} onclick="addToCart('${p.name}', '${p.price}')">
-                                    ${isOutOfStock ? 'نفد من المخزون ❌' : 'أضف إلى السلة 🛒'}
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                });
-            }
-            document.getElementById('catalogGrid').innerHTML = gridHtml;
+    function generateOrderId() {
+        const randomNum = Math.floor(10000 + Math.random() * 90000);
+        return `TK-${randomNum}`;
+    }
+
+    function checkout() {
+        if (cart.length === 0) {
+            alert('السلة فارغة، أضف بعض المنتجات أولاً.');
+            return;
         }
 
-        function loadAdminProductsUI() {
-            let adminProdHtml = "";
-            if (allProductsRaw.length === 0) {
-                document.getElementById('adminProductsList').innerHTML = "<p style='color:#777;'>لا توجد منتجات مسجلة.</p>";
-                return;
-            }
-            allProductsRaw.forEach(p => {
-                let statusLabel = p.stockStatus === 'out' ? 'نفد من المخزون ❌' : 'متوفر ✅';
-                adminProdHtml += `
-                    <div style="background:#fcfcfc; border:1px solid #ddd; padding:10px; border-radius:8px; margin-bottom:8px; font-size:12px; display:flex; justify-content:space-between; align-items:center;">
-                        <div>
-                            <strong>${p.name}</strong> - <span style="color:#b8860b;">${p.price}</span> | <span style="color:#666;">${statusLabel}</span>
-                        </div>
-                        <button style="background:#e74c3c; color:#fff; border:none; padding:5px 10px; border-radius:4px; font-weight:bold; cursor:pointer;" onclick="deleteProduct('${p.id}')">حذف نهائي 🗑️</button>
-                    </div>
-                `;
-            });
-            document.getElementById('adminProductsList').innerHTML = adminProdHtml;
+        currentOrderId = generateOrderId();
+        localStorage.setItem('store_order_id', currentOrderId);
+        document.getElementById('displayOrderId').innerText = currentOrderId;
+
+        document.getElementById('menuView').classList.remove('active');
+        document.getElementById('statusView').classList.add('active');
+
+        changeStatus('preparing');
+    }
+
+    function changeStatus(status) {
+        const badge = document.getElementById('currentStatusBadge');
+        const desc = document.getElementById('statusDesc');
+
+        badge.className = 'status-badge';
+        
+        if (status === 'preparing') {
+            badge.classList.add('status-preparing');
+            badge.innerText = 'قيد التجهيز';
+            desc.innerText = 'جاري تجهيز طلبك الآن بعناية...';
+        } else if (status === 'ready') {
+            badge.classList.add('status-ready');
+            badge.innerText = 'جاهز للاستلام';
+            desc.innerText = 'طلبك أصبح جاهزاً، تفضل باستلامه!';
+        } else if (status === 'delivered') {
+            badge.classList.add('status-delivered');
+            badge.innerText.innerText = 'تم التسليم';
+            desc.innerText = 'شكراً لتعاملك معنا، نتمنى لك وقتاً سعيداً!';
         }
+    }
 
-        // إدارة السلة
-        window.addToCart = function(name, priceStr) {
-            let numericPrice = parseFloat(priceStr.replace(/[^0-9.]/g, '')) || 0;
-            let existing = cart.find(item => item.name === name);
-            if (existing) {
-                existing.qty += 1;
-            } else {
-                cart.push({ name, price: numericPrice, qty: 1 });
-            }
-            updateCartUI();
-            alert(`تمت إضافة "${name}" إلى السلة 🛒`);
-        }
+    function resetApp() {
+        cart = [];
+        localStorage.removeItem('store_cart');
+        localStorage.removeItem('store_order_id');
+        updateCartUI();
+        document.getElementById('statusView').classList.remove('active');
+        document.getElementById('menuView').classList.add('active');
+        filterCategory('market');
+    }
 
-        window.changeQty = function(name, delta) {
-            let item = cart.find(i => i.name === name);
-            if (item) {
-                item.qty += delta;
-                if (item.qty <= 0) {
-                    cart = cart.filter(i => i.name !== name);
-                }
-            }
-            updateCartUI();
-        }
+    // تشغيل أول فئة افتراضياً واسترجاع السلة لو كانت محفوظة
+    filterCategory('market');
+    updateCartUI();
+</script>
 
-        function updateCartUI() {
-            let container = document.getElementById('cartItemsContainer');
-            let checkoutSec = document.getElementById('cartCheckoutSection');
-            let badge = document.getElementById('cartBadge');
-            
-            let totalItemsCount = cart.reduce((sum, i) => sum + i.qty, 0);
-            if (totalItemsCount > 0) {
-                badge.innerText = totalItemsCount;
-                badge.style.display = "block";
-            } else {
-                badge.style.display = "none";
-            }
-
-            if (cart.length === 0) {
-                container.innerHTML = "<p style='color:#777;'>السلة فارغة حالياً.</p>";
-                checkoutSec.style.display = "none";
-                return;
-            }
-
-            let html = "";
-            let totalAmount = 0;
-            cart.forEach(item => {
-                let itemTotal = item.price * item.qty;
-                totalAmount += itemTotal;
-                html += `
-                    <div class="cart-item-row">
-                        <div>
-                            <strong>${item.name}</strong><br>
-                            <span style="color:#b8860b;">${item.price} ريال × ${item.qty} = ${itemTotal} ريال</span>
-                        </div>
-                        <div class="qty-controls">
-                            <button class="qty-btn" onclick="changeQty('${item.name}', -1)">-</button>
-                            <span style="font-weight:bold; width:20px; text-align:center;">${item.qty}</span>
-                            <button class="qty-btn" onclick="changeQty('${item.name}', 1)">+</button>
-                        </div>
-                    </div>
-                `;
-            });
-
-            container.innerHTML = html;
-            document.getElementById('cartTotalPriceText').innerText = `المبلغ الإجمالي: ${totalAmount} ريال`;
-            checkoutSec.style.display = "block";
-        }
-
-        window.checkoutCart = async function() {
-            let location = document.getElementById('deliveryLocation').value.trim();
-            let phone = document.getElementById('deliveryPhone').value.trim();
-            let notes = document.getElementById('deliveryNotes').value.trim();
-
-            if (!location || !phone) {
-                alert("الرجاء إدخال عنوان التوصيل ورقم الجوال!");
-                return;
-            }
-
-            let totalAmount = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
-            let usePoints = confirm(`المبلغ الإجمالي هو ${totalAmount} ريال. هل تريد استخدام نقاط المكافآت لخصم جزء من القيمة؟`);
-            let discount = 0;
-
-            if (usePoints) {
-                try {
-                    let userDocRef = doc(db, "users", currentPhone);
-                    let userSnap = await getDoc(userDocRef);
-                    if (userSnap.exists()) {
-                        let pts = userSnap.data().points || 0;
-                        if (pts >= 10) {
-                            discount = Math.floor(pts / 10);
-                            totalAmount = Math.max(0, totalAmount - discount);
-                            let remainingPoints = pts % 10;
-                            await updateDoc(userDocRef, { points: remainingPoints });
-                            alert(`تم خصم ${discount} ريال مقابل نقاطك!`);
-                        } else {
-                            alert("نقاطك أقل من 10 ولا يمكن الخصم.");
-                        }
-                    }
-                } catch(e) {}
-            }
-
-            // تجميع تفاصيل المنتجات بنص واحد
-            let itemsSummary = cart.map(i => `${i.name} (×${i.qty})`).join(', ');
-
-            try {
-                await addDoc(collection(db, "orders"), {
-                    customer: currentUser,
-                    phone: phone,
-                    location: location,
-                    notes: notes || "لا توجد ملاحظات",
-                    item: itemsSummary,
-                    price: totalAmount + " ريال",
-                    status: "تم قبول طلبك ✅",
-                    proofImage: "",
-                    createdAt: serverTimestamp()
-                });
-
-                let userRef = doc(db, "users", currentPhone);
-                let uSnap = await getDoc(userRef);
-                let curPts = (uSnap.exists() ? (uSnap.data().points || 0) : 0) + 5;
-                await setDoc(userRef, { points: curPts }, { merge: true });
-                document.getElementById('myPointsDisplay').innerText = curPts + " نقطة";
-                document.getElementById('accPoints').innerText = curPts + " نقطة";
-
-                // تفريغ السلة بعد الطلب الناجح
-                cart = [];
-                updateCartUI();
-                document.getElementById('deliveryLocation').value = "";
-                document.getElementById('deliveryNotes').value = "";
-
-                alert("تم إرسال طلبك بنجاح وحصولك على 5 نقاط ولاء جديدة! 🛵");
-                switchNavTab('tabHistory', document.querySelectorAll('.bottom-nav .nav-item')[2]);
-            } catch(e) {
-                alert("خطأ في إرسال الطلب.");
-            }
-        }
-
-        onSnapshot(collection(db, "orders"), (snapshot) => {
-            let historyHtml = "";
-            let adminOrdersHtml = "";
-            let adminRoutingHtml = "";
-
-            if (snapshot.empty) {
-                let emptyMsg = "<p style='color:#777;'>لا توجد طلبات.</p>";
-                document.getElementById('historyContainer').innerHTML = emptyMsg;
-                document.getElementById('adminOrdersList').innerHTML = emptyMsg;
-                document.getElementById('adminRoutingList').innerHTML = emptyMsg;
-                return;
-            }
-
-            snapshot.forEach((docSnap) => {
-                let data = docSnap.data();
-                let id = docSnap.id;
-                let dateStr = data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleString('ar-SA') : 'الآن';
-
-                let itemCard = `
-                    <div class="order-card">
-                        <h4>الطلبات: ${data.item}</h4>
-                        <p style="color:#b8860b; font-weight:bold; margin-top:3px;">المبلغ الإجمالي: ${data.price}</p>
-                        <p style="color:#666; margin-top:3px;">الموقع: ${data.location || '-'}</p>
-                        <p style="color:#666;">ملاحظات: ${data.notes || '-'}</p>
-                        <p style="color:#666;">التاريخ: ${dateStr}</p>
-                        <p style="margin-top:5px;">الحالة: <span class="status-badge">${data.status}</span></p>
-                        ${data.proofImage ? `<br><img src="${data.proofImage}" style="width:70px; height:70px; border-radius:6px; object-fit:cover; margin-top:5px; border:1px solid #d4af37;"><p style="color:#27ae60; font-size:11px;">إثبات التسليم مرفق ✅</p>` : ''}
-                    </div>
-                `;
-
-                if (data.phone === currentPhone) {
-                    historyHtml += itemCard;
-                }
-
-                adminOrdersHtml += `
-                    <div class="order-card">
-                        <h4>${data.item} - ${data.price}</h4>
-                        <p style="color:#666;">العميل: ${data.customer} | جوال: ${data.phone}</p>
-                        <p style="color:#666;">الموقع: ${data.location || '-'}</p>
-                        <p style="color:#666;">ملاحظات العميل: ${data.notes || '-'}</p>
-                        <p style="color:#666;">الوقت: ${dateStr}</p>
-                        <p style="margin-top:5px;">الحالة: <span class="status-badge">${data.status}</span></p>
-                        ${data.proofImage ? `<img src="${data.proofImage}" style="width:60px; height:60px; border-radius:6px; object-fit:cover; margin-top:5px;">` : ''}
-                        
-                        <div style="margin-top:10px; display:flex; gap:5px; flex-wrap:wrap;">
-                            <button style="background:#d4af37; color:#ffffff; border:none; padding:5px 10px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:11px;" onclick="updateOrderStatus('${id}', 'تم قبول طلبك ✅')">قبول</button>
-                            <button style="background:#e67e22; color:white; border:none; padding:5px 10px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:11px;" onclick="updateOrderStatus('${id}', 'جاري التجهيز 👨‍🍳')">تجهيز</button>
-                            <button style="background:#2980b9; color:white; border:none; padding:5px 10px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:11px;" onclick="updateOrderStatus('${id}', 'الطلب قادم إليك 🛵')">قادم إليك</button>
-                            <button style="background:#27ae60; color:white; border:none; padding:5px 10px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:11px;" onclick="deliverWithProof('${id}')">إتمام وإرفاق صورة</button>
-                        </div>
-                    </div>
-                `;
-
-                let cleanPhone = data.phone ? data.phone.replace(/[^0-9]/g, '') : '';
-                let whatsMsg = encodeURIComponent(`مرحباً بك ${data.customer}، تم إتمام طلبك من تكة 🛵\nالطلبات: ${data.item}\nالمبلغ: ${data.price}\nموقع التوصيل: ${data.location}\nشكراً لثقتك بنا!`);
-                
-                adminRoutingHtml += `
-                    <div class="order-card" style="border-right-color: #27ae60;">
-                        <h4>العميل: ${data.customer}</h4>
-                        <p style="color:#666;">رقم الجوال: ${data.phone}</p>
-                        <p style="color:#666;">الموقع: ${data.location || '-'}</p>
-                        <p style="color:#666;">الطلبات: ${data.item} - ${data.price}</p>
-                        <a href="https://wa.me/${cleanPhone}?text=${whatsMsg}" target="_blank" style="display:inline-block; background:#27ae60; color:#white; padding:8px 14px; border-radius:6px; font-weight:bold; text-decoration:none; margin-top:10px; font-size:12px;">🟢 إرسال واتساب للعميل (تم إتمام الطلب)</a>
-                    </div>
-                `;
-            });
-
-            document.getElementById('historyContainer').innerHTML = historyHtml || "<p style='color:#777;'>ليس لديك طلبات سابقة في السجل.</p>";
-            document.getElementById('adminOrdersList').innerHTML = adminOrdersHtml;
-            document.getElementById('adminRoutingList').innerHTML = adminRoutingHtml;
-        });
-
-        onSnapshot(collection(db, "users"), (snapshot) => {
-            let usersHtml = "";
-            if (snapshot.empty) {
-                document.getElementById('adminUsersList').innerHTML = "<p style='color:#777;'>لا توجد حسابات مسجلة حتى الآن.</p>";
-                return;
-            }
-            snapshot.forEach((docSnap) => {
-                let u = docSnap.data();
-                usersHtml += `
-                    <div style="background:#fcfcfc; border:1px solid #ddd; padding:10px; border-radius:8px; margin-bottom:8px; font-size:12px;">
-                        <p style="color:#222; font-weight:bold;">الاسم: ${u.name} | الجوال: ${u.phone}</p>
-                        <p style="color:#b8860b; margin-top:3px;">رصيد النقاط: ${u.points || 0} نقطة</p>
-                        <button style="background:#d4af37; color:#ffffff; border:none; padding:4px 8px; border-radius:4px; margin-top:6px; cursor:pointer; font-weight:bold;" onclick="addCustomPoints('${u.phone}')">➕ تعديل وإضافة نقاط</button>
-                    </div>
-                `;
-            });
-            document.getElementById('adminUsersList').innerHTML = usersHtml;
-        });
-
-        window.addCustomPoints = async function(phoneNum) {
-            let ptsToAdd = prompt("أدخل عدد النقاط المراد إضافتها لهذا العميل:", "10");
-            if (!ptsToAdd) return;
-            try {
-                let userRef = doc(db, "users", phoneNum);
-                let uSnap = await getDoc(userRef);
-                let currentPts = uSnap.exists() ? (uSnap.data().points || 0) : 0;
-                let newTotal = currentPts + parseInt(ptsToAdd);
-                await setDoc(userRef, { points: newTotal }, { merge: true });
-                alert("تم تحديث النقاط للعميل بنجاح!");
-            } catch(e) { alert("خطأ في التحديث."); }
-        }
-
-        window.updateOrderStatus = async function(id, statusText) {
-            await updateDoc(doc(db, "orders", id), { status: statusText });
-        }
-
-        window.deliverWithProof = async function(id) {
-            let fileInput = document.createElement('input');
-            fileInput.type = 'file';
-            fileInput.accept = 'image/*';
-            fileInput.onchange = e => {
-                let file = e.target.files[0];
-                let reader = new FileReader();
-                reader.onload = async function(event) {
-                    await updateDoc(doc(db, "orders", id), {
-                        status: "تم توصيل الطلب بنجاح ✅",
-                        proofImage: event.target.result
-                    });
-                    alert("تم إتمام الطلب وإرفاق صورة الإثبات بنجاح!");
-                };
-                reader.readAsDataURL(file);
-            };
-            fileInput.click();
-        };
-    </script>
 </body>
 </html>
