@@ -441,7 +441,6 @@
             }
         }
 
-        // دالة للتحكم اليدوي في تواجد الصنف (تبديل الحالة بين متوفر ونفد المخزون) من لوحة الأدمن مباشرة
         window.toggleProductStock = async function(id, currentStatus) {
             let newStatus = currentStatus === 'available' ? 'out' : 'available';
             try {
@@ -645,6 +644,7 @@
             let totalPrice = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
 
             try {
+                // إرسال الطلب مباشرة ومحفوظ بدقة
                 await addDoc(collection(db, "orders"), {
                     customerName: currentUser,
                     customerPhone: phone,
@@ -671,10 +671,12 @@
                 updateCartUI();
                 switchNavTab('tabHistory', document.querySelectorAll('.bottom-nav .nav-item')[2]);
             } catch(e) {
-                alert("حدث خطأ أثناء إرسال الطلب.");
+                console.error("Order error:", e);
+                alert("حدث خطأ أثناء إرسال الطلب، تأكد من الاتصال.");
             }
         }
 
+        // الاستماع المباشر للطلبات بدون شروط معقدة لضمان ظهورها عندك فوراً
         onSnapshot(collection(db, "orders"), (snapshot) => {
             let historyHtml = "";
             let adminOrdersHtml = "";
@@ -689,13 +691,14 @@
                     myOrders.push(order);
                 }
 
-                let itemsListText = order.items.map(i => `${i.name} (×${i.qty})`).join('، ');
+                let itemsListText = order.items ? order.items.map(i => `${i.name} (×${i.qty})`).join('، ') : 'منتجات متعددة';
                 
                 adminOrdersHtml += `
                     <div class="order-card">
                         <p><b>العميل:</b> ${order.customerName} (${order.customerPhone})</p>
                         <p><b>الطلبات:</b> ${itemsListText}</p>
                         <p><b>الموقع:</b> ${order.location}</p>
+                        <p><b>الملاحظات:</b> ${order.notes || 'لا توجد ملاحظات'}</p>
                         <p><b>المبلغ:</b> ${order.totalPrice} ريال</p>
                         <p style="margin-top:5px;"><b>الحالة:</b> <span class="status-badge">${order.status}</span></p>
                         <div style="margin-top:8px; display:flex; gap:6px;">
@@ -708,7 +711,7 @@
                 adminRoutingHtml += `
                     <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #eee; font-size:13px;">
                         <span><b>${order.customerName}</b> (${order.customerPhone})</span>
-                        <a href="https://wa.me/966${order.customerPhone.replace(/^0/, '')}?text=${encodeURIComponent('مرحباً يا ' + order.customerName + '، تم إتمام طلبك من تكة بنجاح 🛵')}" target="_blank" style="background:#27ae60; color:#white; padding:5px 10px; border-radius:6px; text-decoration:none; font-size:12px; font-weight:bold;">إرسال واتساب 🟢</a>
+                        <a href="https://wa.me/966${order.customerPhone.replace(/^0/, '')}?text=${encodeURIComponent('مرحباً يا ' + order.customerName + '، تم إتمام طلبك من تكة بنجاح 🛵')}" target="_blank" style="background:#27ae60; color:#fff; padding:5px 10px; border-radius:6px; text-decoration:none; font-size:12px; font-weight:bold;">إرسال واتساب 🟢</a>
                     </div>
                 `;
             });
@@ -717,7 +720,7 @@
                 historyHtml = "<p style='color: #777;'>لا توجد طلبات سابقة.</p>";
             } else {
                 myOrders.forEach(o => {
-                    let itemsTxt = o.items.map(i => `${i.name} (×${i.qty})`).join('، ');
+                    let itemsTxt = o.items ? o.items.map(i => `${i.name} (×${i.qty})`).join('، ') : '';
                     historyHtml += `
                         <div class="order-card">
                             <p><b>رقم الطلب:</b> ${o.id.slice(0,6)}</p>
