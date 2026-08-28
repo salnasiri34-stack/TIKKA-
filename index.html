@@ -8,6 +8,7 @@
     <!-- إعدادات الـ PWA وApple -->
     <link rel="apple-touch-icon" href="https://images.unsplash.com/photo-1555939594-58d7cb561ad1">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="تكة | Tikka">
     <link rel="icon" type="image/png" href="https://images.unsplash.com/photo-1555939594-58d7cb561ad1">
@@ -459,7 +460,7 @@
         let userWallet = 0;
         let useRewards = false;
         let useWallet = false;
-        let activeCoupon = null; // {code, value, type}
+        let activeCoupon = null;
         let availableCoupons = [];
 
         let isInitialOrderLoad = true;
@@ -532,7 +533,6 @@
             document.getElementById('authScreen').classList.remove('active');
             document.getElementById('appScreen').classList.add('active');
 
-            // مراقبة بيانات المستخدم الحية (النقاط والمحفظة)
             onSnapshot(doc(db, "users", currentPhone), (userDoc) => {
                 if (userDoc.exists()) {
                     let data = userDoc.data();
@@ -590,16 +590,47 @@
             btn.classList.add('active');
         }
 
-        function convertFileToBase64(fileInputId) {
+        // دالة آمنة لضغط وتحويل الصورة لمنع تجاوز حجم قاعدة البيانات
+        function compressImageAndConvertToBase64(fileInputId) {
             return new Promise((resolve) => {
                 let fileInput = document.getElementById(fileInputId);
-                if (fileInput.files && fileInput.files[0]) {
-                    let reader = new FileReader();
-                    reader.onload = function(e) { resolve(e.target.result); };
-                    reader.readAsDataURL(fileInput.files[0]);
-                } else {
+                if (!fileInput.files || !fileInput.files[0]) {
                     resolve("https://images.unsplash.com/photo-1555939594-58d7cb561ad1");
+                    return;
                 }
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    let img = new Image();
+                    img.onload = function() {
+                        let canvas = document.createElement('canvas');
+                        let ctx = canvas.getContext('2d');
+                        let MAX_WIDTH = 500;
+                        let MAX_HEIGHT = 500;
+                        let width = img.width;
+                        let height = img.height;
+
+                        if (width > height) {
+                            if (width > MAX_WIDTH) {
+                                height *= MAX_WIDTH / width;
+                                width = MAX_WIDTH;
+                            }
+                        } else {
+                            if (height > MAX_HEIGHT) {
+                                width *= MAX_HEIGHT / height;
+                                height = MAX_HEIGHT;
+                            }
+                        }
+                        canvas.width = width;
+                        canvas.height = height;
+                        ctx.drawImage(img, 0, 0, width, height);
+                        resolve(canvas.toDataURL('image/jpeg', 0.7));
+                    };
+                    img.src = e.target.result;
+                };
+                reader.onerror = function() {
+                    resolve("https://images.unsplash.com/photo-1555939594-58d7cb561ad1");
+                };
+                reader.readAsDataURL(fileInput.files[0]);
             });
         }
 
@@ -610,10 +641,11 @@
             let category = document.getElementById('pCategory').value;
             let stockStatus = document.getElementById('pStockStatus').value;
             let desc = document.getElementById('pDesc').value.trim();
-            let imgBase64 = await convertFileToBase64('pImageFile');
 
             if(!name || !price) { alert("أدخل اسم المنتج والسعر!"); return; }
+            
             try {
+                let imgBase64 = await compressImageAndConvertToBase64('pImageFile');
                 await addDoc(collection(db, "products"), { 
                     name, 
                     price: price.includes("ريال") ? price : price + " ريال", 
@@ -626,7 +658,10 @@
                 document.getElementById('pOldPrice').value = "";
                 document.getElementById('pDesc').value = "";
                 document.getElementById('pImageFile').value = "";
-            } catch(e) { alert("خطأ أثناء الحفظ."); }
+            } catch(e) {
+                console.error("Error adding product:", e);
+                alert("خطأ أثناء الحفظ: تأكد أن حجم الصورة غير كبير جداً.");
+            }
         }
 
         window.deleteProduct = async function(id) {
@@ -644,7 +679,7 @@
             let title = document.getElementById('adTitleInput').value.trim();
             let desc = document.getElementById('adDescInput').value.trim();
             let type = document.getElementById('adTypeInput').value;
-            let imgBase64 = await convertFileToBase64('adImageFile');
+            let imgBase64 = await compressImageAndConvertToBase64('adImageFile');
             if(!title) { alert("أدخل العنوان!"); return; }
             try {
                 await setDoc(doc(db, "settings", "announcement"), { title, desc, type, img: imgBase64, active: true });
@@ -652,7 +687,6 @@
             } catch(e) {}
         }
 
-        // خاصية حذف الإعلان
         window.deleteAnnouncement = async function() {
             if (confirm("هل تريد حذف الإعلان الحالي نهائياً؟")) {
                 try {
@@ -689,7 +723,6 @@
             }
         });
 
-        // إدارة أكواد الخصم
         window.addNewCoupon = async function() {
             let code = document.getElementById('couponCodeText').value.trim().toUpperCase();
             let val = parseFloat(document.getElementById('couponDiscountVal').value) || 0;
@@ -831,7 +864,6 @@
             updateCartUI();
         }
 
-        // تشغيل وإيقاف استخدام المكافآت والمحفظة
         window.toggleRewardsUsage = function(status) {
             useRewards = status;
             document.getElementById('btnEnablePoints').style.background = status ? '#27ae60' : '#444';
@@ -934,11 +966,9 @@
                 else discount = (subtotal * activeCoupon.value) / 100;
             }
 
-            let pointsUsedDiscount = 0;
             let pointsToDeduct = 0;
             if (useRewards && userPoints > 0) {
                 pointsToDeduct = userPoints;
-                pointsDiscount = userPoints / 10;
             }
 
             let walletUsedDiscount = 0;
@@ -961,7 +991,6 @@
                     createdAt: serverTimestamp()
                 });
 
-                // تحديث نقاط ورصيد المحفظة للمستخدم (خصم المستخدم إذا استخدم مكافأته أو محفظته، أو إضافة نقاط جديدة للطلب)
                 let earnedPoints = Math.floor(finalTotal / 10);
                 let newPoints = (useRewards ? 0 : userPoints) + earnedPoints;
                 let newWallet = userWallet - walletToDeduct;
@@ -979,7 +1008,6 @@
             } catch(e) { alert("حدث خطأ أثناء الإرسال."); }
         }
 
-        // جلب الطلبات مرتبة تنازلياً مع صوت التنبيه للطلبات الجديدة
         const ordersQuery = query(collection(db, "orders"), orderBy("createdAt", "desc"));
 
         onSnapshot(ordersQuery, (snapshot) => {
@@ -1099,7 +1127,6 @@
             try { await updateDoc(doc(db, "orders", orderId), { status: newStatus }); } catch(e) {}
         }
 
-        // إدارة العملاء والنقاط والمحفظة من لوحة الأدمن (إضافة نقاط أو رصيد تعويضات وهدايا)
         onSnapshot(collection(db, "users"), (snapshot) => {
             let usersHtml = "";
             snapshot.forEach(docSnap => {
