@@ -119,8 +119,37 @@
         .admin-panel-section.active { display: block; }
         .admin-input { width: 100%; padding: 10px; background: #1f1f1f; border: 1px solid #333; color: #fff; border-radius: 6px; margin-bottom: 10px; font-size: 13px; }
 
-        .order-card { background: #141414; border: 1px solid #222; padding: 15px; border-radius: 10px; margin-bottom: 12px; border-right: 5px solid #d4af37; font-size: 13px; }
+        /* تنسيق كارد الطلب في لوحة الأدمن مع إطارات وأطراف تنبيه حمراء */
+        .order-card { 
+            background: #141414; 
+            border: 2px solid #e74c3c; 
+            padding: 15px; 
+            border-radius: 10px; 
+            margin-bottom: 15px; 
+            border-right: 8px solid #e74c3c; 
+            font-size: 13px; 
+            box-shadow: 0 0 10px rgba(231, 76, 60, 0.3);
+        }
         .status-badge { background: #2c250a; color: #d4af37; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: bold; display: inline-block; border: 1px solid #d4af37; }
+
+        /* تصميم قائمة المنتجات المصغرة داخل كارد الطلب بالأدمن */
+        .order-product-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #1a1a1a;
+            padding: 6px 10px;
+            border-radius: 6px;
+            margin-top: 6px;
+            border: 1px solid #333;
+        }
+        .order-product-img {
+            width: 38px;
+            height: 38px;
+            object-fit: cover;
+            border-radius: 4px;
+            background: #222;
+        }
 
         footer { text-align: center; padding: 15px; font-size: 12px; color: #666; background: #0b0b0b; border-top: 1px solid #222; margin-top: 30px; }
     </style>
@@ -263,7 +292,7 @@
                     </div>
 
                     <div id="secOrders" class="admin-panel-section">
-                        <h4 style="color:#d4af37; margin-bottom:10px;">📦 طلبات العملاء الحية</h4>
+                        <h4 style="color:#d4af37; margin-bottom:10px;">📦 طلبات العملاء الحية (الجديد في الأعلى)</h4>
                         <div id="adminOrdersList"><p style="color:#777;">جاري التحميل...</p></div>
                     </div>
 
@@ -334,10 +363,10 @@
         }
     </script>
 
-    <!-- سكربت Firebase والمنطق البرمجي المعدل والمحصن -->
+    <!-- سكربت Firebase والمنطق البرمجي المعدل -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, deleteDoc, onSnapshot, updateDoc, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, deleteDoc, onSnapshot, updateDoc, doc, setDoc, getDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCbT5oJoSWA31DDkfuZ1pHmcjjUh_PiLmw",
@@ -605,7 +634,7 @@
             if (existing) { 
                 existing.qty += 1; 
             } else { 
-                cart.push({ id: p.id, name: p.name, price: numericPrice, qty: 1 }); 
+                cart.push({ id: p.id, name: p.name, price: numericPrice, qty: 1, img: p.img }); 
             }
             updateCartUI();
             alert("تمت الإضافة للسلة!");
@@ -643,7 +672,10 @@
                 totalPrice += sub;
                 html += `
                     <div class="cart-item-row">
-                        <div><b>${i.name}</b> (${i.price} ريال)</div>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <img src="${i.img}" style="width:32px; height:32px; object-fit:cover; border-radius:4px;">
+                            <div><b>${i.name}</b><br><span style="color:#d4af37;">${i.price} ريال</span></div>
+                        </div>
                         <div class="qty-controls">
                             <button class="qty-btn" onclick="changeQty('${i.id}', -1)">-</button>
                             <span>${i.qty}</span>
@@ -653,7 +685,7 @@
                 `;
             });
             container.innerHTML = html;
-            document.getElementById('cartTotalPriceText').innerText = "المبلغ الإجمالي: " + totalPrice + " ريال";
+            document.getElementById('cartTotalPriceText').innerText = "المبلغ الإجمالي للمنتجات: " + totalPrice + " ريال";
             checkoutSec.style.display = "block";
         }
 
@@ -671,6 +703,7 @@
                     customerName: currentUser,
                     customerPhone: phone,
                     location, notes, items: cart, totalPrice,
+                    deliveryFee: 0, // قيمة التوصيل الافتراضية يحددها الأدمن لاحقاً
                     status: "قيد المراجعة 🕒",
                     createdAt: serverTimestamp()
                 });
@@ -688,7 +721,10 @@
             } catch(e) { alert("حدث خطأ أثناء الإرسال."); }
         }
 
-        onSnapshot(collection(db, "orders"), (snapshot) => {
+        // جلب الطلبات مرتبة تنازلياً حسب الوقت (الأحدث أولاً)
+        const ordersQuery = query(collection(db, "orders"), orderBy("createdAt", "desc"));
+
+        onSnapshot(ordersQuery, (snapshot) => {
             let historyHtml = "";
             let adminOrdersHtml = "";
             let adminRoutingHtml = "";
@@ -702,15 +738,53 @@
                     myOrders.push(order);
                 }
 
-                let itemsListText = order.items ? order.items.map(i => `${i.name} (×${i.qty})`).join('، ') : '';
-                
+                // بناء قائمة المنتجات بالصور والأسماء والأسعار للوحة الأدمن وسجل العميل
+                let productsDetailsHtml = "";
+                if (order.items && order.items.length > 0) {
+                    order.items.forEach(item => {
+                        productsDetailsHtml += `
+                            <div class="order-product-item">
+                                <img src="${item.img || 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1'}" class="order-product-img">
+                                <div style="flex:1;">
+                                    <div style="font-weight:bold; color:#fff;">${item.name}</div>
+                                    <div style="font-size:11px; color:#d4af37;">الكمية: ${item.qty} | السعر: ${item.price} ريال</div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+
+                let timeString = "جاري التحديث...";
+                if (order.createdAt && order.createdAt.toDate) {
+                    timeString = order.createdAt.toDate().toLocaleString('ar-SA');
+                }
+
+                let deliveryFeeVal = order.deliveryFee !== undefined ? order.deliveryFee : 0;
+                let finalTotal = (order.totalPrice || 0) + Number(deliveryFeeVal);
+
+                // كارد الطلب في لوحة الأدمن مع خانة لتحديد قيمة التوصيل
                 adminOrdersHtml += `
                     <div class="order-card">
+                        <p style="color: #e74c3c; font-weight: bold; margin-bottom: 5px;">🔔 رقم الطلب: #${order.id.slice(0, 6).toUpperCase()} | ⏰ الوقت: ${timeString}</p>
                         <p><b>العميل:</b> ${order.customerName || 'بدون اسم'} (${order.customerPhone || 'بدون رقم'})</p>
-                        <p><b>الطلبات:</b> ${itemsListText}</p>
                         <p><b>الموقع:</b> ${order.location || 'غير محدد'}</p>
                         <p><b>الملاحظات:</b> ${order.notes || 'لا توجد'}</p>
-                        <p><b>المبلغ:</b> ${order.totalPrice || 0} ريال</p>
+                        
+                        <div style="margin: 8px 0;">
+                            <p style="font-weight:bold; color:#d4af37; margin-bottom:4px;">🛒 المنتجات المطلوبة:</p>
+                            ${productsDetailsHtml}
+                        </div>
+
+                        <div style="background: #1f1a05; border: 1px solid #d4af37; padding: 10px; border-radius: 6px; margin: 10px 0;">
+                            <p style="font-size:12px; color:#ccc;">مجموع المنتجات: ${order.totalPrice || 0} ريال</p>
+                            <div style="display:flex; align-items:center; gap:8px; margin-top:8px;">
+                                <label style="font-size:12px; color:#d4af37; font-weight:bold;">قيمة التوصيل (ريال):</label>
+                                <input type="number" id="deliveryFeeInput_${order.id}" class="admin-input" style="margin-bottom:0; width:90px; padding:5px;" value="${deliveryFeeVal}" placeholder="0">
+                                <button class="logout-btn" style="background:#d4af37; color:#0b0b0b; font-weight:bold;" onclick="saveDeliveryFee('${order.id}')">حفظ التوصيل</button>
+                            </div>
+                            <p style="font-size:13px; font-weight:bold; color:#27ae60; margin-top:8px;">المبلغ الإجمالي النهائي (مع التوصيل): ${finalTotal} ريال</p>
+                        </div>
+
                         <p style="margin-top:5px;"><b>الحالة:</b> <span class="status-badge">${order.status || 'قيد المراجعة'}</span></p>
                         <div style="margin-top:8px; display:flex; gap:6px;">
                             <button class="logout-btn" onclick="updateOrderStatus('${order.id}', 'جاري التوصيل 🛵')">جاري التوصيل</button>
@@ -719,36 +793,48 @@
                     </div>
                 `;
 
-                // كود آمن 100% لتنظيف رقم الجوال ومنع خطأ الـ replace
+                if (order.customerPhone === currentPhone) {
+                    historyHtml += `
+                        <div class="order-card" style="border: 1px solid #222; border-right: 5px solid #d4af37; box-shadow: none;">
+                            <p><b>رقم الطلب:</b> ${o.id.slice(0,6).toUpperCase()}</p>
+                            <div style="margin: 8px 0;">${productsDetailsHtml}</div>
+                            <p><b>سعر المنتجات:</b> ${o.totalPrice || 0} ريال</p>
+                            <p><b>قيمة التوصيل:</b> ${deliveryFeeVal} ريال</p>
+                            <p style="color:#27ae60; font-weight:bold;"><b>الإجمالي النهائي:</b> ${finalTotal} ريال</p>
+                            <p style="margin-top:5px;"><b>الحالة:</b> <span class="status-badge">${o.status || 'قيد المراجعة'}</span></p>
+                        </div>
+                    `;
+                }
+
                 let cleanPhone = (order.customerPhone || '').toString().replace(/^0/, '');
                 adminRoutingHtml += `
                     <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #222; font-size:13px;">
                         <span><b>${order.customerName || 'عميل'}</b> (${order.customerPhone || ''})</span>
-                        <a href="https://wa.me/966${cleanPhone}?text=${encodeURIComponent('مرحباً يا ' + (order.customerName || '') + '، بخصوص طلبك من تكة 🛵')}" target="_blank" style="background:#27ae60; color:#fff; padding:5px 10px; border-radius:6px; text-decoration:none; font-size:12px; font-weight:bold;">واتساب 🟢</a>
+                        <a href="https://wa.me/966${cleanPhone}?text=${encodeURIComponent('مرحباً يا ' + (order.customerName || '') + '، بخصوص طلبك من تكة 🛵 رقم الطلب: #' + order.id.slice(0,6).toUpperCase())}" target="_blank" style="background:#27ae60; color:#fff; padding:5px 10px; border-radius:6px; text-decoration:none; font-size:12px; font-weight:bold;">واتساب 🟢</a>
                     </div>
                 `;
             });
 
             if (myOrders.length === 0) {
                 historyHtml = "<p style='color: #777;'>لا توجد طلبات سابقة.</p>";
-            } else {
-                myOrders.forEach(o => {
-                    let itemsTxt = o.items ? o.items.map(i => `${i.name} (×${i.qty})`).join('، ') : '';
-                    historyHtml += `
-                        <div class="order-card">
-                            <p><b>رقم الطلب:</b> ${o.id.slice(0,6)}</p>
-                            <p><b>المنتجات:</b> ${itemsTxt}</p>
-                            <p><b>المبلغ:</b> ${o.totalPrice || 0} ريال</p>
-                            <p style="margin-top:5px;"><b>الحالة:</b> <span class="status-badge">${o.status || 'قيد المراجعة'}</span></p>
-                        </div>
-                    `;
-                });
             }
 
             document.getElementById('historyContainer').innerHTML = historyHtml;
             document.getElementById('adminOrdersList').innerHTML = adminOrdersHtml || "<p style='color:#777;'>لا توجد طلبات.</p>";
             document.getElementById('adminRoutingList').innerHTML = adminRoutingHtml || "<p style='color:#777;'>لا توجد أرقام.</p>";
         });
+
+        // دالة حفظ قيمة التوصيل التي يحددها الأدمن للطلب
+        window.saveDeliveryFee = async function(orderId) {
+            let feeInput = document.getElementById(`deliveryFeeInput_${orderId}`).value;
+            let feeValue = parseFloat(feeInput) || 0;
+            try {
+                await updateDoc(doc(db, "orders", orderId), { deliveryFee: feeValue });
+                alert("تم تحديث وحفظ قيمة التوصيل بنجاح!");
+            } catch(e) {
+                alert("حدث خطأ أثناء حفظ قيمة التوصيل.");
+            }
+        }
 
         window.updateOrderStatus = async function(orderId, newStatus) {
             try { await updateDoc(doc(db, "orders", orderId), { status: newStatus }); } catch(e) {}
