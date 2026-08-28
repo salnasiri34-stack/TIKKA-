@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تكة | Tikka</title>
+    <title>تكة | Tikka - النظام المتكامل</title>
     <!-- استيراد مكتبات Firebase عبر CDN -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         
-        // إعدادات فايربيس الخاصة بك
         const firebaseConfig = {
             apiKey: "AIzaSyD-YOUR-API-KEY",
             authDomain: "tikka-c.firebaseapp.com",
@@ -22,34 +21,34 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // ربط الدوال بالنافذة العامة لتتعامل الأزرار معها بسلاسة
         window.db = db;
         window.collection = collection;
         window.addDoc = addDoc;
         window.onSnapshot = onSnapshot;
         window.doc = doc;
         window.updateDoc = updateDoc;
+        window.deleteDoc = deleteDoc;
     </script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { 
-            background: linear-gradient(135deg, #1a1a1a, #0d0d0d); 
+            background: linear-gradient(135deg, #121212, #1a1a1a); 
             color: #f5f5f5; 
             direction: rtl; 
-            padding: 30px 15px; 
+            padding: 20px; 
             min-height: 100vh;
         }
         .container { 
             width: 100%;
-            max-width: 764px; /* التصميم المطلوب بعرض 764 بكسل بدقة */
+            max-width: 800px; 
             margin: 0 auto; 
-            background: #212121; 
+            background: #1e1e1e; 
             padding: 30px; 
             border-radius: 16px; 
-            box-shadow: 0 8px 30px rgba(0,0,0,0.7); 
+            box-shadow: 0 10px 35px rgba(0,0,0,0.8); 
             border: 1px solid #333;
         }
-        h1 { text-align: center; color: #ff9800; margin-bottom: 25px; font-size: 28px; text-shadow: 0 2px 4px rgba(0,0,0,0.4); }
+        h1 { text-align: center; color: #ff9800; margin-bottom: 25px; font-size: 30px; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
         h2 { color: #ffb74d; margin-bottom: 15px; font-size: 20px; border-bottom: 2px solid #333; padding-bottom: 8px; }
         
         .btn { 
@@ -64,7 +63,7 @@
             cursor: pointer; 
             margin-top: 12px; 
             transition: all 0.3s ease;
-            box-shadow: 0 4px 10px rgba(255,152,0,0.3);
+            box-shadow: 0 4px 12px rgba(255,152,0,0.3);
         }
         .btn:hover { background: linear-gradient(135deg, #f57c00, #e65100); transform: translateY(-2px); }
         
@@ -82,16 +81,16 @@
         }
         input:focus { border-color: #ff9800; }
 
-        .order-card { 
-            background: #2a2a2a; 
+        .card { 
+            background: #252525; 
             padding: 16px; 
             border-radius: 10px; 
             margin-bottom: 15px; 
             border-right: 5px solid #ff9800; 
             font-size: 15px; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.4);
         }
-        .order-card p { margin-bottom: 8px; line-height: 1.5; }
+        .card p { margin-bottom: 8px; line-height: 1.5; }
         
         .status-badge { 
             background: #ff9800; 
@@ -102,34 +101,45 @@
             font-weight: bold;
         }
         
-        .logout-btn { 
+        .action-btn { 
             background: #d32f2f; 
             color: #fff; 
             border: none; 
-            padding: 8px 16px; 
+            padding: 8px 14px; 
             border-radius: 8px; 
             cursor: pointer; 
             font-size: 13px; 
             font-weight: bold;
             transition: background 0.2s;
         }
-        .logout-btn:hover { background: #b71c1c; }
+        .action-btn:hover { background: #b71c1c; }
 
         .section { display: none; }
         .active { display: block; }
 
         .menu-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
             gap: 15px;
             margin-bottom: 25px;
         }
         .menu-item {
-            background: #2a2a2a;
-            padding: 15px;
+            background: #252525;
+            padding: 16px;
             border-radius: 10px;
             text-align: center;
             border: 1px solid #383838;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            background: #252525;
+            padding: 12px 18px;
+            border-radius: 10px;
+            border: 1px solid #333;
         }
     </style>
 </head>
@@ -138,34 +148,25 @@
     <div class="container">
         <h1>تكة 🍔 | Tikka</h1>
 
-        <!-- شاشة تسجيل الدخول / البداية -->
+        <!-- شاشة تسجيل الدخول -->
         <div id="loginSection" class="section active">
             <h2>تسجيل الدخول للنظام</h2>
-            <p style="color: #aaa; margin-bottom: 15px; font-size: 14px;">أدخل بياناتك للمتابعة أو لوحة التحكم:</p>
+            <p style="color: #aaa; margin-bottom: 15px; font-size: 14px;">أدخل بياناتك للمتابعة (للدخول كمدير اكتب اسم admin أو رقم جوال 0000):</p>
             <input type="text" id="userName" placeholder="اسمك الكريم">
             <input type="tel" id="userPhone" placeholder="رقم الجوال">
             <button class="btn" onclick="login()">دخول</button>
         </div>
 
-        <!-- شاشة العميل (الطلب ومتابعة الطلبات) -->
+        <!-- شاشة العميل -->
         <div id="clientSection" class="section">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; background: #2c2c2c; padding: 12px 18px; border-radius: 10px;">
+            <div class="top-bar">
                 <span id="welcomeUser" style="font-weight:bold; color:#ff9800; font-size: 16px;"></span>
-                <button class="logout-btn" onclick="logout()">خروج</button>
+                <button class="action-btn" onclick="logout()">خروج</button>
             </div>
 
-            <h2>قائمة الطعام المميزة</h2>
-            <div class="menu-grid">
-                <div class="menu-item">
-                    <p style="font-weight: bold; font-size: 17px; margin-bottom: 5px;">وجبة تكة مالح</p>
-                    <p style="color: #ff9800; margin-bottom: 10px; font-weight: bold;">35 ريال</p>
-                    <button class="btn" style="padding: 8px; font-size: 14px; margin-top: 0;" onclick="sendOrder('وجبة تكة مالح', '35 ريال')">طلب الآن</button>
-                </div>
-                <div class="menu-item">
-                    <p style="font-weight: bold; font-size: 17px; margin-bottom: 5px;">وجبة تكا ملكي</p>
-                    <p style="color: #ff9800; margin-bottom: 10px; font-weight: bold;">35 ريال</p>
-                    <button class="btn" style="padding: 8px; font-size: 14px; margin-top: 0;" onclick="sendOrder('وجبة تكا ملكي', '35 ريال')">طلب الآن</button>
-                </div>
+            <h2>قائمة الطعام المتوفرة</h2>
+            <div id="clientMenuGrid" class="menu-grid">
+                <p style="color:#777; text-align:center; grid-column: 1 / -1;">جاري تحميل القائمة...</p>
             </div>
 
             <h2 style="margin-top: 30px;">طلباتي السابقة</h2>
@@ -176,9 +177,21 @@
 
         <!-- شاشة لوحة تحكم الإدارة -->
         <div id="adminSection" class="section">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; background: #2c2c2c; padding: 12px 18px; border-radius: 10px;">
+            <div class="top-bar">
                 <span style="color:#ff9800; font-weight:bold; font-size: 16px;">لوحة تحكم الإدارة ⚙️</span>
-                <button class="logout-btn" onclick="logout()">خروج</button>
+                <button class="action-btn" onclick="logout()">خروج</button>
+            </div>
+
+            <h2>إضافة وجبة جديدة للقائمة</h2>
+            <div class="card" style="border-right-color: #4caf50;">
+                <input type="text" id="newMealName" placeholder="اسم الوجبة (مثال: وجبة تكة الخاصة)">
+                <input type="text" id="newMealPrice" placeholder="السعر (مثال: 40 ريال)">
+                <button class="btn" style="background: linear-gradient(135deg, #4caf50, #388e3c); margin-top:5px;" onclick="addMealToMenu()">إضافة الوجبة للموقع</button>
+            </div>
+
+            <h2 style="margin-top: 30px;">إدارة الوجبات الحالية</h2>
+            <div id="adminMenuManager" style="margin-bottom: 25px;">
+                <p style="color:#777; text-align:center;">جاري تحميل الوجبات...</p>
             </div>
 
             <h2>الطلبات الواردة</h2>
@@ -187,7 +200,7 @@
             </div>
 
             <h2 style="margin-top: 30px;">سجل العملاء للواتساب</h2>
-            <div id="adminRoutingList" style="background: #272727; padding: 15px; border-radius: 10px;">
+            <div id="adminRoutingList" style="background: #252525; padding: 15px; border-radius: 10px; border: 1px solid #333;">
                 <p style="color:#777; text-align:center;">لا توجد أرقام.</p>
             </div>
         </div>
@@ -208,21 +221,58 @@
 
             document.getElementById('loginSection').classList.remove('active');
 
-            // تحقق إذا كان حساب مدير
-            if (currentPhone === "0000" || currentName === "admin") {
+            if (currentPhone === "0000" || currentName.toLowerCase() === "admin") {
                 document.getElementById('adminSection').classList.add('active');
+                initAdminMenuListener();
             } else {
                 document.getElementById('clientSection').classList.add('active');
-                document.getElementById('welcomeUser মহাশয়' || 'welcomeUser').innerText = `أهلاً بك، ${currentName}`;
+                document.getElementById('welcomeUser').innerText = `أهلاً بك، ${currentName}`;
+                initClientMenuListener();
             }
             
-            initFirestoreListener();
+            initOrdersListener();
         }
 
         function logout() {
             location.reload();
         }
 
+        // إضافة وجبة جديدة بواسطة المدير إلى مجموعة menu في فايربيس
+        async function addMealToMenu() {
+            let name = document.getElementById('newMealName').value.trim();
+            let price = document.getElementById('newMealPrice').value.trim();
+
+            if (!name || !price) {
+                alert("الرجاء إدخال اسم الوجبة والسعر");
+                return;
+            }
+
+            try {
+                await window.addDoc(window.collection(window.db, "menu"), {
+                    name: name,
+                    price: price,
+                    createdAt: new Date().toISOString()
+                });
+                document.getElementById('newMealName').value = "";
+                document.getElementById('newMealPrice').value = "";
+                alert("تم إضافة الوجبة بنجاح إلى القائمة! 🎉");
+            } catch (e) {
+                console.error("خطأ في إضافة الوجبة: ", e);
+                alert("حدث خطأ أثناء إضافة الوجبة.");
+            }
+        }
+
+        // حذف وجبة من القائمة
+        async function deleteMeal(mealId) {
+            if (!confirm("هل أنت متأكد من حذف هذه الوجبة؟")) return;
+            try {
+                await window.deleteDoc(window.doc(window.db, "menu", mealId));
+            } catch (e) {
+                console.error("خطأ في الحذف: ", e);
+            }
+        }
+
+        // إرسال طلب جديد من العميل
         async function sendOrder(itemName, itemPrice) {
             if (!window.db) {
                 alert("جاري الاتصال بقاعدة البيانات، حاول بعد قليل.");
@@ -253,7 +303,66 @@
             }
         }
 
-        function initFirestoreListener() {
+        // الاستماع لقائمة الطعام للعملاء
+        function initClientMenuListener() {
+            const checkInterval = setInterval(() => {
+                if (window.db && window.onSnapshot && window.collection) {
+                    clearInterval(checkInterval);
+                    window.onSnapshot(window.collection(window.db, "menu"), (snapshot) => {
+                        let menuHtml = "";
+                        if (snapshot.empty) {
+                            menuHtml = "<p style='color:#777; text-align:center; grid-column: 1 / -1;'>لا توجد وجبات مضافة حالياً من الإدارة.</p>";
+                        } else {
+                            snapshot.forEach(docSnap => {
+                                let meal = docSnap.data();
+                                let mealId = docSnap.id;
+                                menuHtml += `
+                                    <div class="menu-item">
+                                        <p style="font-weight: bold; font-size: 18px; margin-bottom: 5px;">${meal.name}</p>
+                                        <p style="color: #ff9800; margin-bottom: 12px; font-weight: bold; font-size: 16px;">${meal.price}</p>
+                                        <button class="btn" style="padding: 8px; font-size: 14px; margin-top: 0;" onclick="sendOrder('${meal.name}', '${meal.price}')">طلب الآن</button>
+                                    </div>
+                                `;
+                            });
+                        }
+                        document.getElementById('clientMenuGrid').innerHTML = menuHtml;
+                    });
+                }
+            }, 300);
+        }
+
+        // الاستماع لقائمة الطعام الخاصة بالمدير (للإدارة والحذف)
+        function initAdminMenuListener() {
+            const checkInterval = setInterval(() => {
+                if (window.db && window.onSnapshot && window.collection) {
+                    clearInterval(checkInterval);
+                    window.onSnapshot(window.collection(window.db, "menu"), (snapshot) => {
+                        let adminMenuHtml = "";
+                        if (snapshot.empty) {
+                            adminMenuHtml = "<p style='color:#777; text-align:center;'>لا توجد وجبات مضافة.</p>";
+                        } else {
+                            snapshot.forEach(docSnap => {
+                                let meal = docSnap.data();
+                                let mealId = docSnap.id;
+                                adminMenuHtml += `
+                                    <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
+                                        <div>
+                                            <p style="font-weight:bold; font-size:16px;">${meal.name}</p>
+                                            <p style="color:#ff9800; font-size:14px;">${meal.price}</p>
+                                        </div>
+                                        <button class="action-btn" onclick="deleteMeal('${mealId}')">حذف الوجبة 🗑️</button>
+                                    </div>
+                                `;
+                            });
+                        }
+                        document.getElementById('adminMenuManager').innerHTML = adminMenuHtml;
+                    });
+                }
+            }, 300);
+        }
+
+        // الاستماع للطلبات الواردة والطلبات السابقة
+        function initOrdersListener() {
             const checkInterval = setInterval(() => {
                 if (window.db && window.onSnapshot && window.collection) {
                     clearInterval(checkInterval);
@@ -268,7 +377,6 @@
                             let order = docSnap.data();
                             order.id = docSnap.id;
 
-                            // دعم مرن لأسماء الحقول (item / items)
                             let rawItem = order.item || order.items;
                             let itemsListText = "";
                             if (Array.isArray(rawItem)) {
@@ -288,15 +396,15 @@
                             let cPrice = order.totalPrice || order.price || "0";
                             
                             adminOrdersHtml += `
-                                <div class="order-card">
+                                <div class="card">
                                     <p><b>العميل:</b> ${cName} (${cPhone})</p>
                                     <p><b>الطلبات:</b> ${itemsListText}</p>
                                     <p><b>الموقع:</b> ${cLocation}</p>
                                     <p><b>المبلغ:</b> ${cPrice}</p>
                                     <p style="margin-top:8px;"><b>الحالة:</b> <span class="status-badge">${order.status || 'قيد المراجعة 🕒'}</span></p>
                                     <div style="margin-top:12px; display:flex; gap:8px;">
-                                        <button class="logout-btn" style="background:#0288d1;" onclick="updateOrderStatus('${order.id}', 'جاري التوصيل 🛵')">جاري التوصيل</button>
-                                        <button class="logout-btn" style="background:#388e3c;" onclick="updateOrderStatus('${order.id}', 'تم التوصيل بنجاح ✅')">تم التوصيل</button>
+                                        <button class="action-btn" style="background:#0288d1;" onclick="updateOrderStatus('${order.id}', 'جاري التوصيل 🛵')">جاري التوصيل</button>
+                                        <button class="action-btn" style="background:#388e3c;" onclick="updateOrderStatus('${order.id}', 'تم التوصيل بنجاح ✅')">تم التوصيل</button>
                                     </div>
                                 </div>
                             `;
@@ -309,30 +417,34 @@
                             `;
                         });
 
-                        if (myOrders.length === 0) {
-                            historyHtml = "<p style='color: #777; text-align:center; padding: 15px;'>لا توجد طلبات سابقة.</p>";
-                        } else {
-                            myOrders.forEach(o => {
-                                let cPrice = o.totalPrice || o.price || "0";
-                                let rawItem = o.item || o.items;
-                                let itemsTxt = Array.isArray(rawItem) ? rawItem.map(i => `${i.name || 'منتج'} (×${i.qty || 1})`).join('، ') : (rawItem || "طلب خاص");
-                                historyHtml += `
-                                    <div class="order-card">
-                                        <p><b>رقم الطلب:</b> ${o.id.slice(0,6)}</p>
-                                        <p><b>المنتجات:</b> ${itemsTxt}</p>
-                                        <p><b>المبلغ:</b> ${cPrice}</p>
-                                        <p style="margin-top:8px;"><b>الحالة:</b> <span class="status-badge">${o.status || 'قيد المراجعة 🕒'}</span></p>
-                                    </div>
-                                `;
-                            });
+                        if (document.getElementById('historyContainer')) {
+                            if (myOrders.length === 0) {
+                                historyHtml = "<p style='color: #777; text-align:center; padding: 15px;'>لا توجد طلبات سابقة.</p>";
+                            } else {
+                                myOrders.forEach(o => {
+                                    let cPrice = o.totalPrice || o.price || "0";
+                                    let rawItem = o.item || o.items;
+                                    let itemsTxt = Array.isArray(rawItem) ? rawItem.map(i => `${i.name || 'منتج'} (×${i.qty || 1})`).join('، ') : (rawItem || "طلب خاص");
+                                    historyHtml += `
+                                        <div class="card">
+                                            <p><b>رقم الطلب:</b> ${o.id.slice(0,6)}</p>
+                                            <p><b>المنتجات:</b> ${itemsTxt}</p>
+                                            <p><b>المبلغ:</b> ${cPrice}</p>
+                                            <p style="margin-top:8px;"><b>الحالة:</b> <span class="status-badge">${o.status || 'قيد المراجعة 🕒'}</span></p>
+                                        </div>
+                                    `;
+                                });
+                            }
+                            document.getElementById('historyContainer').innerHTML = historyHtml;
                         }
 
-                        document.getElementById('historyContainer').innerHTML = historyHtml;
-                        document.getElementById('adminOrdersList').innerHTML = adminOrdersHtml || "<p style='color:#777; text-align:center; padding: 15px;'>لا توجد طلبات.</p>";
-                        document.getElementById('adminRoutingList').innerHTML = adminRoutingHtml || "<p style='color:#777; text-align:center; padding: 15px;'>لا توجد أرقام.</p>";
+                        if (document.getElementById('adminOrdersList')) {
+                            document.getElementById('adminOrdersList').innerHTML = adminOrdersHtml || "<p style='color:#777; text-align:center; padding: 15px;'>لا توجد طلبات.</p>";
+                            document.getElementById('adminRoutingList').innerHTML = adminRoutingHtml || "<p style='color:#777; text-align:center; padding: 15px;'>لا توجد أرقام.</p>";
+                        }
                     });
                 }
-            }, 500);
+            }, 300);
         }
     </script>
 </body>
