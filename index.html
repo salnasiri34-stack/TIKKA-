@@ -1,121 +1,168 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <link rel="apple-touch-icon" href="https://images.unsplash.com/photo-1555939594-58d7cb561ad1">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="تكة | Tikka">
-    <link rel="icon" type="image/png" href="https://images.unsplash.com/photo-1555939594-58d7cb561ad1">
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تكة | Tikka - التطبيق الاحترافي المتكامل</title>
+    
+    <!-- إعدادات الـ PWA وApple -->
+    <link rel="apple-touch-icon" href="https://images.unsplash.com/photo-1555939594-58d7cb561ad1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="تكة | Tikka">
+    <link rel="icon" type="image/png" href="https://images.unsplash.com/photo-1555939594-58d7cb561ad1">
+    <meta name="theme-color" content="#0b0b0b">
+
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: Tahoma, sans-serif; }
-        body { background-color: #f8f9fa; color: #333; padding-bottom: 90px; }
+        body { background-color: #0b0b0b; color: #f1f2f6; padding-bottom: 90px; }
 
-        header { background-color: #ffffff; border-bottom: 1px solid #e0e0e0; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 20px;
+            background-color: #0b0b0b;
+            color: #d4af37;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
         .logo-area { display: flex; align-items: center; gap: 12px; }
-        .logo-img { width: 42px; height: 42px; border-radius: 50%; border: 2px solid #d4af37; object-fit: cover; }
-        .logo-title { font-size: 20px; font-weight: bold; color: #b8860b; }
+        .corner-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 1px solid #d4af37;
+            object-fit: cover;
+            box-shadow: 0 0 8px rgba(212, 175, 55, 0.3);
+        }
+        .logo-title { font-size: 18px; font-weight: bold; color: #d4af37; }
         
-        .user-panel { display: flex; align-items: center; gap: 12px; }
-        .logout-btn { background: #f1f2f6; border: 1px solid #d4af37; color: #b8860b; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+        .user-panel { display: flex; align-items: center; gap: 10px; }
+        .logout-btn { background: #1a1a1a; border: 1px solid #d4af37; color: #d4af37; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+
+        /* بانر إضافة إلى الشاشة الرئيسية لـ آيفون */
+        #add-to-home-banner {
+            display: none;
+            background: linear-gradient(135deg, #1a1a1a, #2c2c2c);
+            border-bottom: 2px solid #d4af37;
+            padding: 12px 20px;
+            text-align: center;
+            font-size: 13px;
+            color: #d4af37;
+        }
+        #add-to-home-banner button {
+            background: #d4af37;
+            color: #0b0b0b;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-right: 8px;
+            cursor: pointer;
+        }
 
         .container { max-width: 1000px; margin: 20px auto; padding: 0 15px; }
         .screen { display: none; }
         .screen.active { display: block; }
 
-        .auth-box { background: #ffffff; border: 1px solid #e0e0e0; max-width: 400px; margin: 60px auto; padding: 35px; border-radius: 16px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .auth-box { background: #141414; border: 1px solid #222; max-width: 400px; margin: 60px auto; padding: 35px; border-radius: 16px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .auth-box img { width: 75px; height: 75px; border-radius: 50%; border: 2px solid #d4af37; margin-bottom: 15px; object-fit: cover; }
-        .auth-box h2 { color: #b8860b; margin-bottom: 20px; }
-        .auth-input { width: 100%; padding: 12px; margin-bottom: 15px; background: #fdfdfd; border: 1px solid #ccc; color: #333; border-radius: 8px; font-size: 15px; outline: none; }
-        .auth-btn { width: 100%; background: #d4af37; color: #ffffff; border: none; padding: 12px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        .auth-box h2 { color: #d4af37; margin-bottom: 20px; }
+        .auth-input { width: 100%; padding: 12px; margin-bottom: 15px; background: #1f1f1f; border: 1px solid #333; color: #fff; border-radius: 8px; font-size: 15px; outline: none; }
+        .auth-btn { width: 100%; background: #d4af37; color: #0b0b0b; border: none; padding: 12px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
 
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #ffffff; border-top: 1px solid #e0e0e0; display: flex; justify-content: space-around; padding: 10px 0; z-index: 1000; box-shadow: 0 -2px 10px rgba(0,0,0,0.03); }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #111; border-top: 1px solid #222; display: flex; justify-content: space-around; padding: 10px 0; z-index: 1000; }
         .nav-item { background: none; border: none; color: #777; font-size: 12px; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; position: relative; }
-        .nav-item.active { color: #b8860b; font-weight: bold; }
+        .nav-item.active { color: #d4af37; font-weight: bold; }
         .nav-item span.icon { font-size: 20px; }
         .cart-badge { position: absolute; top: -2px; right: 28%; background: #e74c3c; color: white; border-radius: 50%; padding: 1px 6px; font-size: 10px; font-weight: bold; display: none; }
 
-        .ads-banner { background: linear-gradient(135deg, #fffcf0, #fff5d1); border: 1px solid #e6ca65; padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: center; box-shadow: 0 4px 10px rgba(212,175,55,0.05); }
-        .ads-banner h3 { color: #b8860b; margin-bottom: 5px; font-size: 16px; }
-        .ads-banner p { font-size: 13px; color: #555; }
+        .ads-banner { background: linear-gradient(135deg, #1f1a05, #2c250a); border: 1px solid #d4af37; padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: center; }
+        .ads-banner h3 { color: #d4af37; margin-bottom: 5px; font-size: 16px; }
+        .ads-banner p { font-size: 13px; color: #ccc; }
 
-        .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 2000; padding: 20px; }
-        .popup-card { background: #ffffff; width: 100%; max-width: 380px; border-radius: 16px; padding: 25px; text-align: center; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.2); border: 1px solid #d4af37; }
-        .popup-close-btn { position: absolute; top: 12px; left: 12px; background: #f1f2f6; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 16px; font-weight: bold; cursor: pointer; color: #333; display: flex; align-items: center; justify-content: center; }
-        .popup-img { width: 100%; height: 160px; object-fit: cover; border-radius: 10px; margin-bottom: 12px; background: #f0f0f0; }
+        .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 2000; padding: 20px; }
+        .popup-card { background: #141414; width: 100%; max-width: 380px; border-radius: 16px; padding: 25px; text-align: center; position: relative; border: 1px solid #d4af37; }
+        .popup-close-btn { position: absolute; top: 12px; left: 12px; background: #222; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 16px; font-weight: bold; cursor: pointer; color: #d4af37; display: flex; align-items: center; justify-content: center; }
+        .popup-img { width: 100%; height: 160px; object-fit: cover; border-radius: 10px; margin-bottom: 12px; background: #222; }
 
         .sub-tabs { display: flex; gap: 10px; margin-bottom: 15px; }
-        .sub-tab-btn { background: #ffffff; border: 1px solid #ccc; color: #555; padding: 8px 18px; border-radius: 20px; font-size: 13px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
-        .sub-tab-btn.active { background: #d4af37; color: #ffffff; border-color: #d4af37; font-weight: bold; }
+        .sub-tab-btn { background: #141414; border: 1px solid #333; color: #aaa; padding: 8px 18px; border-radius: 20px; font-size: 13px; cursor: pointer; }
+        .sub-tab-btn.active { background: #d4af37; color: #0b0b0b; border-color: #d4af37; font-weight: bold; }
 
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
-        .card { background: #ffffff; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.03); position: relative; }
-        .card img { width: 100%; height: 140px; object-fit: cover; background: #f0f0f0; }
+        .card { background: #141414; border: 1px solid #222; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        .card img { width: 100%; height: 140px; object-fit: cover; background: #222; }
         .card-body { padding: 12px; }
-        .card-title { font-size: 16px; font-weight: bold; color: #222; margin-bottom: 4px; }
-        .card-desc { font-size: 12px; color: #666; margin-bottom: 8px; }
+        .card-title { font-size: 16px; font-weight: bold; color: #fff; margin-bottom: 4px; }
+        .card-desc { font-size: 12px; color: #aaa; margin-bottom: 8px; }
         
         .price-box { margin-bottom: 8px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-        .price { font-weight: bold; color: #b8860b; font-size: 15px; }
-        .old-price { text-decoration: line-through; color: #999; font-size: 12px; }
+        .price { font-weight: bold; color: #d4af37; font-size: 15px; }
+        .old-price { text-decoration: line-through; color: #666; font-size: 12px; }
         .sale-badge { background: #e74c3c; color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
 
-        .btn { width: 100%; background-color: #d4af37; color: #ffffff; border: none; padding: 8px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .btn.out-of-stock { background-color: #95a5a6; cursor: not-allowed; }
+        .btn { width: 100%; background-color: #d4af37; color: #0b0b0b; border: none; padding: 8px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .btn.out-of-stock { background-color: #444; color: #888; cursor: not-allowed; }
 
-        .cart-item-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; font-size: 13px; }
+        .cart-item-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #222; font-size: 13px; }
         .qty-controls { display: flex; align-items: center; gap: 8px; }
-        .qty-btn { background: #f1f2f6; border: 1px solid #ccc; width: 26px; height: 26px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        .cart-summary-box { background: #fffcf0; border: 1px solid #d4af37; padding: 15px; border-radius: 10px; margin-top: 15px; }
+        .qty-btn { background: #222; border: 1px solid #444; color: #fff; width: 26px; height: 26px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .cart-summary-box { background: #1f1a05; border: 1px solid #d4af37; padding: 15px; border-radius: 10px; margin-top: 15px; }
 
-        .admin-trigger-btn { width: 100%; background: linear-gradient(135deg, #d4af37, #b8860b); color: #ffffff; border: none; padding: 15px; border-radius: 10px; font-size: 16px; font-weight: 900; cursor: pointer; text-align: center; margin-top: 15px; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2); }
-
+        .admin-trigger-btn { width: 100%; background: linear-gradient(135deg, #d4af37, #b8860b); color: #0b0b0b; border: none; padding: 15px; border-radius: 10px; font-size: 16px; font-weight: 900; cursor: pointer; text-align: center; margin-top: 15px; }
         .admin-sections-nav { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
-        .admin-sec-btn { background: #ffffff; border: 1px solid #d4af37; color: #b8860b; padding: 8px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; white-space: nowrap; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        .admin-sec-btn.active { background: #d4af37; color: #ffffff; font-weight: bold; }
-        .admin-panel-section { display: none; background: #ffffff; border: 1px solid #e0e0e0; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
+        .admin-sec-btn { background: #141414; border: 1px solid #d4af37; color: #d4af37; padding: 8px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; white-space: nowrap; }
+        .admin-sec-btn.active { background: #d4af37; color: #0b0b0b; font-weight: bold; }
+        .admin-panel-section { display: none; background: #141414; border: 1px solid #222; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
         .admin-panel-section.active { display: block; }
-        .admin-input { width: 100%; padding: 10px; background: #fafafa; border: 1px solid #ddd; color: #333; border-radius: 6px; margin-bottom: 10px; font-size: 13px; }
+        .admin-input { width: 100%; padding: 10px; background: #1f1f1f; border: 1px solid #333; color: #fff; border-radius: 6px; margin-bottom: 10px; font-size: 13px; }
 
-        .order-card { background: #ffffff; border: 1px solid #e0e0e0; padding: 15px; border-radius: 10px; margin-bottom: 12px; border-right: 5px solid #d4af37; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
-        .status-badge { background: #fff8e1; color: #b8860b; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: bold; display: inline-block; border: 1px solid #ffe082; }
+        .order-card { background: #141414; border: 1px solid #222; padding: 15px; border-radius: 10px; margin-bottom: 12px; border-right: 5px solid #d4af37; font-size: 13px; }
+        .status-badge { background: #2c250a; color: #d4af37; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: bold; display: inline-block; border: 1px solid #d4af37; }
 
-        footer { text-align: center; padding: 15px; font-size: 12px; color: #666; background: #ffffff; border-top: 1px solid #e0e0e0; margin-top: 30px; }
+        footer { text-align: center; padding: 15px; font-size: 12px; color: #666; background: #0b0b0b; border-top: 1px solid #222; margin-top: 30px; }
     </style>
 </head>
 <body>
+
+    <!-- بانر التثبيت لأجهزة آيفون -->
+    <div id="add-to-home-banner">
+        <span>📱 تثبيت تطبيق تكة لشاشتك الرئيسية لتجربة أفضل!</span>
+        <button onclick="showInstallInstructions()">طريقة التثبيت</button>
+    </div>
 
     <div id="popupOverlay" class="popup-overlay">
         <div class="popup-card">
             <button class="popup-close-btn" onclick="closePopupAd()">×</button>
             <img id="popupImgTag" class="popup-img" src="" style="display:none;">
-            <h3 id="popupTitleText" style="color: #b8860b; margin-bottom: 8px; font-size: 18px;">تنبيه مهم</h3>
-            <p id="popupDescText" style="color: #555; font-size: 13px; line-height: 1.5;">...</p>
+            <h3 id="popupTitleText" style="color: #d4af37; margin-bottom: 8px; font-size: 18px;">تنبيه مهم</h3>
+            <p id="popupDescText" style="color: #ccc; font-size: 13px; line-height: 1.5;">...</p>
         </div>
     </div>
 
+    <!-- شاشة تسجيل الدخول -->
     <div id="authScreen" class="screen active">
         <div class="auth-box">
             <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1" onerror="this.style.display='none'">
             <h2>تكة | Tikka</h2>
-            <p style="color: #666; font-size: 13px; margin-bottom: 20px;">تطبيق التوصيل الذكي والمميز</p>
+            <p style="color: #888; font-size: 13px; margin-bottom: 20px;">تطبيق التوصيل الذكي والمميز</p>
             <input type="text" id="userName" class="auth-input" placeholder="اسمك الكريم">
             <input type="tel" id="userPhone" class="auth-input" placeholder="رقم الجوال">
             <button class="auth-btn" onclick="login()">دخول التطبيق</button>
         </div>
     </div>
 
+    <!-- واجهة التطبيق الرئيسية -->
     <div id="appScreen" class="screen">
-        <header>
+        <header class="app-header">
             <div class="logo-area">
-                <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1" class="logo-img" onerror="this.style.display='none'">
+                <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1" class="corner-logo" onerror="this.style.display='none'">
                 <div class="logo-title">تكة | Tikka 🛵</div>
             </div>
             <div class="user-panel">
-                <span id="welcomeUser" style="font-weight: bold; color: #b8860b; font-size: 13px;"></span>
+                <span id="welcomeUser" style="font-weight: bold; color: #d4af37; font-size: 13px;"></span>
                 <button class="logout-btn" onclick="logout()">خروج</button>
             </div>
         </header>
@@ -137,63 +184,63 @@
             </div>
 
             <div id="tabCart" class="screen">
-                <h2 style="margin-bottom: 15px; color: #333; font-size: 18px;">سلة المشتريات 🛒</h2>
+                <h2 style="margin-bottom: 15px; color: #fff; font-size: 18px;">سلة المشتريات 🛒</h2>
                 <div id="cartItemsContainer"><p style="color: #777;">السلة فارغة حالياً.</p></div>
                 
-                <div id="cartCheckoutSection" style="display:none; margin-top: 20px; background: #fff; border: 1px solid #e0e0e0; padding: 20px; border-radius: 12px;">
-                    <h3 style="color: #b8860b; margin-bottom: 12px; font-size: 16px;">تفاصيل وموقع التوصيل 📍</h3>
+                <div id="cartCheckoutSection" style="display:none; margin-top: 20px; background: #141414; border: 1px solid #222; padding: 20px; border-radius: 12px;">
+                    <h3 style="color: #d4af37; margin-bottom: 12px; font-size: 16px;">تفاصيل وموقع التوصيل 📍</h3>
                     <input type="text" id="deliveryLocation" class="admin-input" placeholder="عنوان التوصيل بالتفصيل (الحي، الشارع، رقم البناية)">
                     <input type="tel" id="deliveryPhone" class="admin-input" placeholder="رقم الجوال للتواصل">
                     <textarea id="deliveryNotes" class="admin-input" placeholder="ملاحظات إضافية للطلب (اختياري)..." style="height:60px;"></textarea>
 
                     <div class="cart-summary-box">
-                        <p style="font-size:14px; font-weight:bold; color:#b8860b;" id="cartTotalPriceText">المبلغ الإجمالي: 0 ريال</p>
+                        <p style="font-size:14px; font-weight:bold; color:#d4af37;" id="cartTotalPriceText">المبلغ الإجمالي: 0 ريال</p>
                     </div>
 
-                    <button class="btn" style="margin-top: 15px; background-color: #27ae60;" onclick="checkoutCart()">إتمام وإرسال الطلب نهائياً 🛵</button>
+                    <button class="btn" style="margin-top: 15px; background-color: #27ae60; color:#fff;" onclick="checkoutCart()">إتمام وإرسال الطلب نهائياً 🛵</button>
                 </div>
             </div>
 
             <div id="tabHistory" class="screen">
-                <h2 style="margin-bottom: 15px; color: #333; font-size: 18px;">سجل طلباتك السابقة وإثباتات التوصيل 📦</h2>
+                <h2 style="margin-bottom: 15px; color: #fff; font-size: 18px;">سجل طلباتك السابقة 📦</h2>
                 <div id="historyContainer"><p style="color: #777;">لا توجد طلبات سابقة.</p></div>
             </div>
 
             <div id="tabRewards" class="screen">
-                <div style="background: #ffffff; border: 1px solid #e0e0e0; padding: 25px; border-radius: 15px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.02);">
-                    <h2 style="color: #b8860b; margin-bottom: 10px;">نظام نقاط ولاء تكة ⭐</h2>
-                    <p style="color: #666; font-size: 13px; margin-bottom: 15px;">اجمع النقاط مع كل طلب واستخدمها لخصم قيمة طلباتك القادمة!</p>
-                    <div style="font-size: 30px; font-weight: bold; color: #b8860b;" id="myPointsDisplay">0 نقطة</div>
-                    <p style="font-size: 11px; color: #888; margin-top: 5px;">كل 10 نقاط تساوي خصم ريال واحد.</p>
+                <div style="background: #141414; border: 1px solid #222; padding: 25px; border-radius: 15px; text-align: center; margin-bottom: 20px;">
+                    <h2 style="color: #d4af37; margin-bottom: 10px;">نظام نقاط ولاء تكة ⭐</h2>
+                    <p style="color: #aaa; font-size: 13px; margin-bottom: 15px;">اجمع النقاط مع كل طلب واستخدمها لخصم قيمة طلباتك القادمة!</p>
+                    <div style="font-size: 30px; font-weight: bold; color: #d4af37;" id="myPointsDisplay">0 نقطة</div>
+                    <p style="font-size: 11px; color: #666; margin-top: 5px;">كل 10 نقاط تساوي خصم ريال واحد.</p>
                 </div>
             </div>
 
             <div id="tabAccount" class="screen">
-                <div style="background: #ffffff; border: 1px solid #e0e0e0; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.02);">
-                    <h2 style="color: #b8860b; margin-bottom: 15px; font-size: 18px;">معلومات الحساب الشخصي 👤</h2>
-                    <p style="margin-bottom: 10px; color:#555;">الاسم: <strong id="accName" style="color:#222;">-</strong></p>
-                    <p style="margin-bottom: 10px; color:#555;">رقم الجوال: <strong id="accPhone" style="color:#222;">-</strong></p>
-                    <p style="margin-bottom: 10px; color:#555;">رصيد النقاط: <strong id="accPoints" style="color:#b8860b;">0 نقطة</strong></p>
+                <div style="background: #141414; border: 1px solid #222; padding: 20px; border-radius: 12px;">
+                    <h2 style="color: #d4af37; margin-bottom: 15px; font-size: 18px;">معلومات الحساب الشخصي 👤</h2>
+                    <p style="margin-bottom: 10px; color:#aaa;">الاسم: <strong id="accName" style="color:#fff;">-</strong></p>
+                    <p style="margin-bottom: 10px; color:#aaa;">رقم الجوال: <strong id="accPhone" style="color:#fff;">-</strong></p>
+                    <p style="margin-bottom: 10px; color:#aaa;">رصيد النقاط: <strong id="accPoints" style="color:#d4af37;">0 نقطة</strong></p>
                 </div>
 
-                <button class="admin-trigger-btn" onclick="openAdminPanelWithPassword()">🔑 لوحة تحكم الأدمن (الرمز السري)</button>
+                <button class="admin-trigger-btn" onclick="openAdminPanelWithPassword()">🔑 لوحة تحكم الأدمن</button>
 
                 <div id="adminPanelWrapper" style="display:none; margin-top: 25px;">
-                    <h3 style="color: #b8860b; margin-bottom: 12px; font-size: 18px; font-weight: 900;">⚙️ لوحة تحكم الأدمن</h3>
+                    <h3 style="color: #d4af37; margin-bottom: 12px; font-size: 18px; font-weight: 900;">⚙️ لوحة تحكم الأدمن</h3>
                     
                     <div class="admin-sections-nav">
                         <button class="admin-sec-btn active" onclick="switchAdminSub('secProducts', this)">إدارة المنتجات</button>
                         <button class="admin-sec-btn" onclick="switchAdminSub('secOrders', this)">متابعة الطلبات</button>
                         <button class="admin-sec-btn" onclick="switchAdminSub('secUsers', this)">إدارة العملاء</button>
-                        <button class="admin-sec-btn" onclick="switchAdminSub('secAds', this)">الإعلانات المهمة</button>
-                        <button class="admin-sec-btn" onclick="switchAdminSub('secRouting', this)" style="background:#27ae60; color:#fff;">التوجيه (واتساب 🟢)</button>
+                        <button class="admin-sec-btn" onclick="switchAdminSub('secAds', this)">الإعلانات</button>
+                        <button class="admin-sec-btn" onclick="switchAdminSub('secRouting', this)" style="background:#27ae60; color:#fff;">واتساب 🟢</button>
                     </div>
 
                     <div id="secProducts" class="admin-panel-section active">
-                        <h4 style="color:#b8860b; margin-bottom:10px;">➕ إضافة منتج جديد (مع التحكم التام بالتواجد)</h4>
+                        <h4 style="color:#d4af37; margin-bottom:10px;">➕ إضافة منتج جديد</h4>
                         <input type="text" id="pName" class="admin-input" placeholder="اسم المنتج">
-                        <input type="text" id="pPrice" class="admin-input" placeholder="السعر الأساسي (مثلاً: 45)">
-                        <input type="text" id="pOldPrice" class="admin-input" placeholder="سعر العرض/قبل الخصم (اختياري)">
+                        <input type="text" id="pPrice" class="admin-input" placeholder="السعر (مثلاً: 45)">
+                        <input type="text" id="pOldPrice" class="admin-input" placeholder="سعر الخصم (اختياري)">
                         
                         <select id="pCategory" class="admin-input">
                             <option value="meals">وجبات ساخنة</option>
@@ -202,45 +249,44 @@
 
                         <select id="pStockStatus" class="admin-input">
                             <option value="available">متوفر للطلب ✅</option>
-                            <option value="out">نفد من المخزون (يظهر غير متاح) ❌</option>
+                            <option value="out">نفد من المخزون ❌</option>
                         </select>
 
-                        <label style="font-size:12px; color:#666; display:block; margin-bottom:5px;">اختر صورة المنتج من المعرض:</label>
+                        <label style="font-size:12px; color:#888; display:block; margin-bottom:5px;">صورة المنتج:</label>
                         <input type="file" id="pImageFile" class="admin-input" accept="image/*">
                         <textarea id="pDesc" class="admin-input" placeholder="وصف المنتج..." style="height:50px;"></textarea>
-                        <button class="btn" onclick="addNewProduct()">إضافة للقائمة وحفظ نهائي</button>
+                        <button class="btn" onclick="addNewProduct()">إضافة وحفظ نهائي</button>
                         
-                        <hr style="margin: 20px 0; border:0; border-top:1px solid #eee;">
-                        <h4 style="color:#b8860b; margin-bottom:10px;">🗑️ قائمة المنتجات (للتحكم المباشر وتعديل التواجد والحذف)</h4>
+                        <hr style="margin: 20px 0; border:0; border-top:1px solid #222;">
+                        <h4 style="color:#d4af37; margin-bottom:10px;">🗑️ قائمة المنتجات</h4>
                         <div id="adminProductsList"><p style="color:#777;">جاري التحميل...</p></div>
                     </div>
 
                     <div id="secOrders" class="admin-panel-section">
-                        <h4 style="color:#b8860b; margin-bottom:10px;">📦 طلبات جميع العملاء الحية</h4>
+                        <h4 style="color:#d4af37; margin-bottom:10px;">📦 طلبات العملاء الحية</h4>
                         <div id="adminOrdersList"><p style="color:#777;">جاري التحميل...</p></div>
                     </div>
 
                     <div id="secUsers" class="admin-panel-section">
-                        <h4 style="color:#b8860b; margin-bottom:10px;">👥 قائمة كل من سجل في التطبيق والنقاط</h4>
+                        <h4 style="color:#d4af37; margin-bottom:10px;">👥 قائمة العملاء</h4>
                         <div id="adminUsersList"><p style="color:#777;">جاري التحميل...</p></div>
                     </div>
 
                     <div id="secAds" class="admin-panel-section">
-                        <h4 style="color:#b8860b; margin-bottom:10px;">📢 نشر إعلان أو تنبيه مهم</h4>
+                        <h4 style="color:#d4af37; margin-bottom:10px;">📢 نشر إعلان</h4>
                         <input type="text" id="adTitleInput" class="admin-input" placeholder="عنوان الإعلان">
-                        <textarea id="adDescInput" class="admin-input" placeholder="تفاصيل الإعلان أو التنبيه..." style="height:60px;"></textarea>
-                        <label style="font-size:12px; color:#666; display:block; margin-bottom:5px;">صورة الإعلان من المعرض (اختياري):</label>
+                        <textarea id="adDescInput" class="admin-input" placeholder="تفاصيل الإعلان..." style="height:60px;"></textarea>
+                        <label style="font-size:12px; color:#888; display:block; margin-bottom:5px;">صورة الإعلان:</label>
                         <input type="file" id="adImageFile" class="admin-input" accept="image/*">
                         <select id="adTypeInput" class="admin-input">
-                            <option value="popup">إعلان مهم (منبثق بوجه المستخدم مع زر إغلاق X)</option>
-                            <option value="banner">إعلان ثابت (في أعلى الصفحة)</option>
+                            <option value="popup">إعلان منبثق (مع زر إغلاق)</option>
+                            <option value="banner">إعلان ثابت</option>
                         </select>
-                        <button class="btn" onclick="publishAnnouncement()">نشر الإعلان للجميع</button>
+                        <button class="btn" onclick="publishAnnouncement()">نشر للجميع</button>
                     </div>
 
                     <div id="secRouting" class="admin-panel-section">
-                        <h4 style="color:#27ae60; margin-bottom:10px;">🟢 قائمة التوجيه (مراسلة العملاء عبر واتساب)</h4>
-                        <p style="font-size:12px; color:#666; margin-bottom:12px;">انقر على زر "إرسال واتساب" ليتم تحويلك فوراً لرقم العميل مع رسالة جاهزة.</p>
+                        <h4 style="color:#27ae60; margin-bottom:10px;">🟢 مراسلة العملاء عبر واتساب</h4>
                         <div id="adminRoutingList"><p style="color:#777;">جاري التحميل...</p></div>
                     </div>
                 </div>
@@ -249,7 +295,7 @@
         </div>
 
         <footer>
-            <p>&copy; 2026 جميع الحقوق محفوظة لصالح سليمان. التطبيق الرسمي.</p>
+            <p>&copy; 2026 جميع الحقوق محفوظة لصالح سليمان (سلومي). التطبيق الرسمي.</p>
         </footer>
 
         <div class="bottom-nav">
@@ -272,6 +318,23 @@
         </div>
     </div>
 
+    <!-- سكربت فحص آيفون وإظهار البنر -->
+    <script>
+        window.addEventListener('load', () => {
+            const isIos = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+            const isInStandaloneMode = ('standalone' in window.navigator) && (window.navigator.standalone);
+
+            if (isIos && !isInStandaloneMode) {
+                document.getElementById('add-to-home-banner').style.display = 'block';
+            }
+        });
+
+        function showInstallInstructions() {
+            alert("لإضافة التطبيق لشاشتك الرئيسية:\n1. اضغط على زر المشاركة (Share) في متصفح سفاري.\n2. اختر 'إضافة إلى الشاشة الرئيسية' (Add to Home Screen).");
+        }
+    </script>
+
+    <!-- سكربت Firebase والمنطق البرمجي -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, deleteDoc, onSnapshot, updateDoc, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -316,14 +379,9 @@
                 let userRef = doc(db, "users", phone);
                 let userDoc = await getDoc(userRef);
                 if (!userDoc.exists()) {
-                    await setDoc(userRef, {
-                        name: name,
-                        phone: phone,
-                        points: 0,
-                        lastLogin: serverTimestamp()
-                    });
+                    await setDoc(userRef, { name, phone, points: 0, lastLogin: serverTimestamp() });
                 } else {
-                    await updateDoc(userRef, { name: name, lastLogin: serverTimestamp() });
+                    await updateDoc(userRef, { name, lastLogin: serverTimestamp() });
                 }
             } catch(e) {}
 
@@ -352,7 +410,7 @@
             let pass = prompt("أدخل الرمز السري الخاص بلوحة الأدمن:");
             if (pass === "Ss@10203040") {
                 document.getElementById('adminPanelWrapper').style.display = "block";
-                alert("تم التحقق بنجاح! أهلاً بك في لوحة تحكم الأدمن.");
+                alert("تم التحقق بنجاح!");
             } else if (pass !== null) {
                 alert("الرمز السري غير صحيح!");
             }
@@ -367,7 +425,6 @@
         window.switchNavTab = function(tabId, btn) {
             document.querySelectorAll('#appScreen > .container > .screen').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.bottom-nav .nav-item').forEach(b => b.classList.remove('active'));
-            
             document.getElementById(tabId).classList.add('active');
             btn.classList.add('active');
         }
@@ -408,46 +465,32 @@
             let desc = document.getElementById('pDesc').value.trim();
             let imgBase64 = await convertFileToBase64('pImageFile');
 
-            if(!name || !price) { alert("أدخل اسم المنتج والسعر الأساسي!"); return; }
+            if(!name || !price) { alert("أدخل اسم المنتج والسعر!"); return; }
             try {
                 await addDoc(collection(db, "products"), { 
                     name, 
                     price: price.includes("ريال") ? price : price + " ريال", 
                     oldPrice: oldPrice ? (oldPrice.includes("ريال") ? oldPrice : oldPrice + " ريال") : "", 
-                    category, 
-                    stockStatus, 
-                    img: imgBase64, 
-                    desc 
+                    category, stockStatus, img: imgBase64, desc 
                 });
-                alert("تم إضافة المنتج وحفظه في قاعدة البيانات بنجاح!");
+                alert("تم إضافة المنتج بنجاح!");
                 document.getElementById('pName').value = "";
                 document.getElementById('pPrice').value = "";
                 document.getElementById('pOldPrice').value = "";
                 document.getElementById('pDesc').value = "";
                 document.getElementById('pImageFile').value = "";
-            } catch(e) {
-                alert("حدث خطأ أثناء الحفظ في قاعدة البيانات. تأكد من اتصال الإنترنت.");
-            }
+            } catch(e) { alert("خطأ أثناء الحفظ."); }
         }
 
         window.deleteProduct = async function(id) {
-            if (confirm("هل أنت متأكد من رغبتك في حذف هذا المنتج نهائياً؟")) {
-                try {
-                    await deleteDoc(doc(db, "products", id));
-                    alert("تم حذف المنتج نهائياً.");
-                } catch(e) {
-                    alert("خطأ أثناء الحذف.");
-                }
+            if (confirm("هل أنت متأكد من الحذف؟")) {
+                try { await deleteDoc(doc(db, "products", id)); } catch(e) { alert("خطأ بالحذف"); }
             }
         }
 
         window.toggleProductStock = async function(id, currentStatus) {
             let newStatus = currentStatus === 'available' ? 'out' : 'available';
-            try {
-                await updateDoc(doc(db, "products", id), { stockStatus: newStatus });
-            } catch(e) {
-                alert("فشل تحديث حالة التواجد.");
-            }
+            try { await updateDoc(doc(db, "products", id), { stockStatus: newStatus }); } catch(e) {}
         }
 
         window.publishAnnouncement = async function() {
@@ -455,15 +498,11 @@
             let desc = document.getElementById('adDescInput').value.trim();
             let type = document.getElementById('adTypeInput').value;
             let imgBase64 = await convertFileToBase64('adImageFile');
-
-            if(!title) { alert("أدخل عنوان الإعلان!"); return; }
-
+            if(!title) { alert("أدخل العنوان!"); return; }
             try {
-                await setDoc(doc(db, "settings", "announcement"), { 
-                    title, desc, type, img: imgBase64, active: true 
-                });
-                alert("تم نشر الإعلان بنجاح للجميع!");
-            } catch(e) { alert("فشل النشر."); }
+                await setDoc(doc(db, "settings", "announcement"), { title, desc, type, img: imgBase64, active: true });
+                alert("تم نشر الإعلان بنجاح!");
+            } catch(e) {}
         }
 
         window.closePopupAd = function() {
@@ -509,7 +548,6 @@
         function loadProductsUI() {
             let gridHtml = "";
             let filtered = allProductsCache.filter(p => p.category === currentCategoryFilter);
-            
             if (filtered.length === 0) {
                 gridHtml = "<p style='color:#777;'>لا توجد منتجات مضافة لهذا القسم حالياً.</p>";
             } else {
@@ -523,10 +561,10 @@
                                 <div class="card-desc">${p.desc || 'منتج طازج ومميز'}</div>
                                 <div class="price-box">
                                     <span class="price">${p.price}</span>
-                                    ${p.oldPrice ? `<span class="old-price">${p.oldPrice}</span><span class="sale-badge">عرض خصم 🔥</span>` : ''}
+                                    ${p.oldPrice ? `<span class="old-price">${p.oldPrice}</span><span class="sale-badge">خصم 🔥</span>` : ''}
                                 </div>
                                 <button class="btn ${isOutOfStock ? 'out-of-stock' : ''}" ${isOutOfStock ? 'disabled' : ''} onclick="addToCart('${p.name.replace(/'/g, "\\'")}', '${p.price}', '${p.stockStatus}')">
-                                    ${isOutOfStock ? 'نفد من المخزون ❌' : 'أضف إلى السلة 🛒'}
+                                    ${isOutOfStock ? 'نفد المخزون ❌' : 'أضف للسلة 🛒'}
                                 </button>
                             </div>
                         </div>
@@ -539,23 +577,19 @@
         function loadAdminProductsUI() {
             let adminHtml = "";
             if (allProductsRaw.length === 0) {
-                adminHtml = "<p style='color:#777;'>لا توجد منتجات مضافة حالياً.</p>";
+                adminHtml = "<p style='color:#777;'>لا توجد منتجات.</p>";
             } else {
                 allProductsRaw.forEach(p => {
                     let isAvailable = p.stockStatus !== 'out';
                     adminHtml += `
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; font-size: 13px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #222; font-size: 13px;">
                             <div>
                                 <b>${p.name}</b> (${p.price})<br>
-                                <span style="font-size:11px; color:${isAvailable ? '#27ae60' : '#e74c3c'}">
-                                    الحالة: ${isAvailable ? 'متوفر للعملاء ✅' : 'غير متوفر ❌'}
-                                </span>
+                                <span style="font-size:11px; color:${isAvailable ? '#27ae60' : '#e74c3c'}">${isAvailable ? 'متوفر ✅' : 'غير متوفر ❌'}</span>
                             </div>
                             <div style="display:flex; gap:6px;">
-                                <button class="logout-btn" style="background:${isAvailable ? '#fff8e1' : '#e8f8f5'}; border-color:#d4af37;" onclick="toggleProductStock('${p.id}', '${p.stockStatus || 'available'}')">
-                                    ${isAvailable ? 'إيقاف التواجد' : 'تفعيل التواجد'}
-                                </button>
-                                <button class="logout-btn" style="background:#ffeaa7; border-color:#d4af37;" onclick="deleteProduct('${p.id}')">حذف</button>
+                                <button class="logout-btn" onclick="toggleProductStock('${p.id}', '${p.stockStatus || 'available'}')">${isAvailable ? 'إيقاف' : 'تفعيل'}</button>
+                                <button class="logout-btn" style="color:#e74c3c;" onclick="deleteProduct('${p.id}')">حذف</button>
                             </div>
                         </div>
                     `;
@@ -565,28 +599,19 @@
         }
 
         window.addToCart = function(name, priceStr, stockStatus) {
-            if (stockStatus === 'out') {
-                alert("عذراً، هذا المنتج غير متوفر حالياً.");
-                return;
-            }
+            if (stockStatus === 'out') { return; }
             let numericPrice = parseFloat(priceStr.replace(/[^0-9.]/g, '')) || 0;
             let existing = cart.find(item => item.name === name);
-            if (existing) {
-                existing.qty += 1;
-            } else {
-                cart.push({ name, price: numericPrice, qty: 1 });
-            }
+            if (existing) { existing.qty += 1; } else { cart.push({ name, price: numericPrice, qty: 1 }); }
             updateCartUI();
-            alert("تمت إضافة المنتج إلى السلة بنجاح!");
+            alert("تمت الإضافة للسلة!");
         }
 
         window.changeQty = function(name, delta) {
             let item = cart.find(i => i.name === name);
             if (item) {
                 item.qty += delta;
-                if (item.qty <= 0) {
-                    cart = cart.filter(i => i.name !== name);
-                }
+                if (item.qty <= 0) { cart = cart.filter(i => i.name !== name); }
             }
             updateCartUI();
         }
@@ -594,12 +619,7 @@
         function updateCartUI() {
             let totalQty = cart.reduce((sum, i) => sum + i.qty, 0);
             let badge = document.getElementById('cartBadge');
-            if (totalQty > 0) {
-                badge.innerText = totalQty;
-                badge.style.display = "block";
-            } else {
-                badge.style.display = "none";
-            }
+            if (totalQty > 0) { badge.innerText = totalQty; badge.style.display = "block"; } else { badge.style.display = "none"; }
 
             let container = document.getElementById('cartItemsContainer');
             let checkoutSec = document.getElementById('cartCheckoutSection');
@@ -636,10 +656,7 @@
             let phone = document.getElementById('deliveryPhone').value.trim();
             let notes = document.getElementById('deliveryNotes').value.trim();
 
-            if (!location || !phone) {
-                alert("الرجاء إدخال عنوان التوصيل ورقم الجوال!");
-                return;
-            }
+            if (!location || !phone) { alert("أدخل العنوان ورقم الجوال!"); return; }
 
             let totalPrice = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
 
@@ -647,35 +664,24 @@
                 await addDoc(collection(db, "orders"), {
                     customerName: currentUser,
                     customerPhone: phone,
-                    location,
-                    notes,
-                    items: cart,
-                    totalPrice,
-                    status: "قيد المراجعة 🕒",
-                    createdAt: serverTimestamp()
+                    location, notes, items: cart, totalPrice,
+                    status: "قيد المراجعة 🕒"
                 });
 
                 let earnedPoints = Math.floor(totalPrice / 10);
                 let userRef = doc(db, "users", currentPhone);
                 let userSnap = await getDoc(userRef);
-                let currentPts = 0;
-                if (userSnap.exists()) {
-                    currentPts = userSnap.data().points || 0;
-                }
-                let newPts = currentPts + earnedPoints;
-                await updateDoc(userRef, { points: newPts });
+                let currentPts = userSnap.exists() ? (userSnap.data().points || 0) : 0;
+                await updateDoc(userRef, { points: currentPts + earnedPoints });
 
-                alert("تم إرسال طلبك بنجاح! شكراً لك.");
+                alert("تم إرسال الطلب بنجاح!");
                 cart = [];
                 updateCartUI();
                 switchNavTab('tabHistory', document.querySelectorAll('.bottom-nav .nav-item')[2]);
-            } catch(e) {
-                console.error("Order error:", e);
-                alert("حدث خطأ أثناء إرسال الطلب، تأكد من الاتصال.");
-            }
+            } catch(e) { alert("حدث خطأ أثناء الإرسال."); }
         }
 
-        // استعلام مباشر ومبسط جداً لجلب الطلبات بدون مشاكل الفهرسة
+        // الاستعلام المباشر والمضمون للطلبات بدون أي قيود ترتيب أو فهارس معطلة
         onSnapshot(collection(db, "orders"), (snapshot) => {
             let historyHtml = "";
             let adminOrdersHtml = "";
@@ -690,14 +696,14 @@
                     myOrders.push(order);
                 }
 
-                let itemsListText = order.items ? order.items.map(i => `${i.name} (×${i.qty})`).join('، ') : 'منتجات متعددة';
+                let itemsListText = order.items ? order.items.map(i => `${i.name} (×${i.qty})`).join('، ') : '';
                 
                 adminOrdersHtml += `
                     <div class="order-card">
                         <p><b>العميل:</b> ${order.customerName} (${order.customerPhone})</p>
                         <p><b>الطلبات:</b> ${itemsListText}</p>
                         <p><b>الموقع:</b> ${order.location}</p>
-                        <p><b>الملاحظات:</b> ${order.notes || 'لا توجد ملاحظات'}</p>
+                        <p><b>الملاحظات:</b> ${order.notes || 'لا توجد'}</p>
                         <p><b>المبلغ:</b> ${order.totalPrice} ريال</p>
                         <p style="margin-top:5px;"><b>الحالة:</b> <span class="status-badge">${order.status}</span></p>
                         <div style="margin-top:8px; display:flex; gap:6px;">
@@ -708,9 +714,9 @@
                 `;
 
                 adminRoutingHtml += `
-                    <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #eee; font-size:13px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #222; font-size:13px;">
                         <span><b>${order.customerName}</b> (${order.customerPhone})</span>
-                        <a href="https://wa.me/966${order.customerPhone.replace(/^0/, '')}?text=${encodeURIComponent('مرحباً يا ' + order.customerName + '، تم إتمام طلبك من تكة بنجاح 🛵')}" target="_blank" style="background:#27ae60; color:#fff; padding:5px 10px; border-radius:6px; text-decoration:none; font-size:12px; font-weight:bold;">إرسال واتساب 🟢</a>
+                        <a href="https://wa.me/966${order.customerPhone.replace(/^0/, '')}?text=${encodeURIComponent('مرحباً يا ' + order.customerName + '، بخصوص طلبك من تكة 🛵')}" target="_blank" style="background:#27ae60; color:#fff; padding:5px 10px; border-radius:6px; text-decoration:none; font-size:12px; font-weight:bold;">واتساب 🟢</a>
                     </div>
                 `;
             });
@@ -724,25 +730,20 @@
                         <div class="order-card">
                             <p><b>رقم الطلب:</b> ${o.id.slice(0,6)}</p>
                             <p><b>المنتجات:</b> ${itemsTxt}</p>
-                            <p><b>المبلغ الإجمالي:</b> ${o.totalPrice} ريال</p>
-                            <p style="margin-top:5px;"><b>حالة الطلب:</b> <span class="status-badge">${o.status}</span></p>
+                            <p><b>المبلغ:</b> ${o.totalPrice} ريال</p>
+                            <p style="margin-top:5px;"><b>الحالة:</b> <span class="status-badge">${o.status}</span></p>
                         </div>
                     `;
                 });
             }
 
             document.getElementById('historyContainer').innerHTML = historyHtml;
-            document.getElementById('adminOrdersList').innerHTML = adminOrdersHtml || "<p style='color:#777;'>لا توجد طلبات جديدة.</p>";
-            document.getElementById('adminRoutingList').innerHTML = adminRoutingHtml || "<p style='color:#777;'>لا توجد أرقام متاحة للتوجيه حالياً.</p>";
+            document.getElementById('adminOrdersList').innerHTML = adminOrdersHtml || "<p style='color:#777;'>لا توجد طلبات.</p>";
+            document.getElementById('adminRoutingList').innerHTML = adminRoutingHtml || "<p style='color:#777;'>لا توجد أرقام.</p>";
         });
 
         window.updateOrderStatus = async function(orderId, newStatus) {
-            try {
-                await updateDoc(doc(db, "orders", orderId), { status: newStatus });
-                alert("تم تحديث حالة الطلب بنجاح!");
-            } catch(e) {
-                alert("فشل تحديث الحالة.");
-            }
+            try { await updateDoc(doc(db, "orders", orderId), { status: newStatus }); } catch(e) {}
         }
 
         onSnapshot(collection(db, "users"), (snapshot) => {
@@ -750,13 +751,13 @@
             snapshot.forEach(docSnap => {
                 let u = docSnap.data();
                 usersHtml += `
-                    <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #eee; font-size:13px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #222; font-size:13px;">
                         <span><b>${u.name}</b> (${u.phone})</span>
-                        <span style="color:#b8860b; font-weight:bold;">${u.points || 0} نقطة</span>
+                        <span style="color:#d4af37; font-weight:bold;">${u.points || 0} نقطة</span>
                     </div>
                 `;
             });
-            document.getElementById('adminUsersList').innerHTML = usersHtml || "<p style='color:#777;'>لا يوجد عملاء مسجلون حالياً.</p>";
+            document.getElementById('adminUsersList').innerHTML = usersHtml || "<p style='color:#777;'>لا توجد بيانات عملاء.</p>";
         });
     </script>
 </body>
