@@ -66,7 +66,6 @@
         .btn { width: 100%; background-color: #d4af37; color: #ffffff; border: none; padding: 8px; border-radius: 8px; font-weight: bold; cursor: pointer; }
         .btn.out-of-stock { background-color: #95a5a6; cursor: not-allowed; }
 
-        /* سلة المشتريات */
         .cart-item-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; font-size: 13px; }
         .qty-controls { display: flex; align-items: center; gap: 8px; }
         .qty-btn { background: #f1f2f6; border: 1px solid #ccc; width: 26px; height: 26px; border-radius: 4px; cursor: pointer; font-weight: bold; }
@@ -123,10 +122,6 @@
 
         <div class="container">
             
-            <div id="appMessageBox" style="display:none; background: #fffcf0; border: 1px solid #d4af37; padding: 12px; border-radius: 10px; margin-bottom: 15px; text-align: center;">
-                <span style="color: #b8860b; font-weight: bold; font-size: 13px;" id="adminMsgText">رسالة جديدة من الإدارة</span>
-            </div>
-
             <div id="tabHome" class="screen active">
                 <div id="activeAdsBanner" class="ads-banner" style="display:none;">
                     <h3 id="adTitleText">العرض الترويجي</h3>
@@ -195,10 +190,10 @@
                     </div>
 
                     <div id="secProducts" class="admin-panel-section active">
-                        <h4 style="color:#b8860b; margin-bottom:10px;">➕ إضافة منتج جديد (مع العروض والمخزون)</h4>
+                        <h4 style="color:#b8860b; margin-bottom:10px;">➕ إضافة منتج جديد (مع التحكم التام بالتواجد)</h4>
                         <input type="text" id="pName" class="admin-input" placeholder="اسم المنتج">
                         <input type="text" id="pPrice" class="admin-input" placeholder="السعر الأساسي (مثلاً: 45)">
-                        <input type="text" id="pOldPrice" class="admin-input" placeholder="سعر العرض/قبل الخصم (اختياري - مثلاً: 60)">
+                        <input type="text" id="pOldPrice" class="admin-input" placeholder="سعر العرض/قبل الخصم (اختياري)">
                         
                         <select id="pCategory" class="admin-input">
                             <option value="meals">وجبات ساخنة</option>
@@ -206,17 +201,17 @@
                         </select>
 
                         <select id="pStockStatus" class="admin-input">
-                            <option value="available">متوفر في المخزون ✅</option>
-                            <option value="out">نفد من المخزون ❌</option>
+                            <option value="available">متوفر للطلب ✅</option>
+                            <option value="out">نفد من المخزون (يظهر غير متاح) ❌</option>
                         </select>
 
                         <label style="font-size:12px; color:#666; display:block; margin-bottom:5px;">اختر صورة المنتج من المعرض:</label>
                         <input type="file" id="pImageFile" class="admin-input" accept="image/*">
                         <textarea id="pDesc" class="admin-input" placeholder="وصف المنتج..." style="height:50px;"></textarea>
-                        <button class="btn" onclick="addNewProduct()">إضافة للقائمة</button>
+                        <button class="btn" onclick="addNewProduct()">إضافة للقائمة وحفظ نهائي</button>
                         
                         <hr style="margin: 20px 0; border:0; border-top:1px solid #eee;">
-                        <h4 style="color:#b8860b; margin-bottom:10px;">🗑️ قائمة المنتجات للحذف أو التعديل الفوري</h4>
+                        <h4 style="color:#b8860b; margin-bottom:10px;">🗑️ قائمة المنتجات (للتحكم المباشر وتعديل التواجد والحذف)</h4>
                         <div id="adminProductsList"><p style="color:#777;">جاري التحميل...</p></div>
                     </div>
 
@@ -245,7 +240,7 @@
 
                     <div id="secRouting" class="admin-panel-section">
                         <h4 style="color:#27ae60; margin-bottom:10px;">🟢 قائمة التوجيه (مراسلة العملاء عبر واتساب)</h4>
-                        <p style="font-size:12px; color:#666; margin-bottom:12px;">انقر على زر "إرسال واتساب" ليتم تحويلك فوراً لرقم العميل مع رسالة جاهزة (تم إتمام طلبك من تكة).</p>
+                        <p style="font-size:12px; color:#666; margin-bottom:12px;">انقر على زر "إرسال واتساب" ليتم تحويلك فوراً لرقم العميل مع رسالة جاهزة.</p>
                         <div id="adminRoutingList"><p style="color:#777;">جاري التحميل...</p></div>
                     </div>
                 </div>
@@ -424,13 +419,15 @@
                     img: imgBase64, 
                     desc 
                 });
-                alert("تم إضافة المنتج بنجاح وحفظه في القاعدة بنجاح!");
+                alert("تم إضافة المنتج وحفظه في قاعدة البيانات بنجاح!");
                 document.getElementById('pName').value = "";
                 document.getElementById('pPrice').value = "";
                 document.getElementById('pOldPrice').value = "";
                 document.getElementById('pDesc').value = "";
                 document.getElementById('pImageFile').value = "";
-            } catch(e) { alert("فشل الإضافة."); }
+            } catch(e) {
+                alert("حدث خطأ أثناء الحفظ في قاعدة البيانات. تأكد من اتصال الإنترنت.");
+            }
         }
 
         window.deleteProduct = async function(id) {
@@ -441,6 +438,16 @@
                 } catch(e) {
                     alert("خطأ أثناء الحذف.");
                 }
+            }
+        }
+
+        // دالة للتحكم اليدوي في تواجد الصنف (تبديل الحالة بين متوفر ونفد المخزون) من لوحة الأدمن مباشرة
+        window.toggleProductStock = async function(id, currentStatus) {
+            let newStatus = currentStatus === 'available' ? 'out' : 'available';
+            try {
+                await updateDoc(doc(db, "products", id), { stockStatus: newStatus });
+            } catch(e) {
+                alert("فشل تحديث حالة التواجد.");
             }
         }
 
@@ -519,7 +526,7 @@
                                     <span class="price">${p.price}</span>
                                     ${p.oldPrice ? `<span class="old-price">${p.oldPrice}</span><span class="sale-badge">عرض خصم 🔥</span>` : ''}
                                 </div>
-                                <button class="btn ${isOutOfStock ? 'out-of-stock' : ''}" ${isOutOfStock ? 'disabled' : ''} onclick="addToCart('${p.name.replace(/'/g, "\\'")}', '${p.price}')">
+                                <button class="btn ${isOutOfStock ? 'out-of-stock' : ''}" ${isOutOfStock ? 'disabled' : ''} onclick="addToCart('${p.name.replace(/'/g, "\\'")}', '${p.price}', '${p.stockStatus}')">
                                     ${isOutOfStock ? 'نفد من المخزون ❌' : 'أضف إلى السلة 🛒'}
                                 </button>
                             </div>
@@ -536,10 +543,21 @@
                 adminHtml = "<p style='color:#777;'>لا توجد منتجات مضافة حالياً.</p>";
             } else {
                 allProductsRaw.forEach(p => {
+                    let isAvailable = p.stockStatus !== 'out';
                     adminHtml += `
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee; font-size: 13px;">
-                            <span><b>${p.name}</b> (${p.price})</span>
-                            <button class="logout-btn" style="background:#ffeaa7; border-color:#d4af37;" onclick="deleteProduct('${p.id}')">حذف</button>
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; font-size: 13px;">
+                            <div>
+                                <b>${p.name}</b> (${p.price})<br>
+                                <span style="font-size:11px; color:${isAvailable ? '#27ae60' : '#e74c3c'}">
+                                    الحالة: ${isAvailable ? 'متوفر للعملاء ✅' : 'غير متوفر ❌'}
+                                </span>
+                            </div>
+                            <div style="display:flex; gap:6px;">
+                                <button class="logout-btn" style="background:${isAvailable ? '#fff8e1' : '#e8f8f5'}; border-color:#d4af37;" onclick="toggleProductStock('${p.id}', '${p.stockStatus || 'available'}')">
+                                    ${isAvailable ? 'إيقاف التواجد' : 'تفعيل التواجد'}
+                                </button>
+                                <button class="logout-btn" style="background:#ffeaa7; border-color:#d4af37;" onclick="deleteProduct('${p.id}')">حذف</button>
+                            </div>
                         </div>
                     `;
                 });
@@ -547,7 +565,11 @@
             document.getElementById('adminProductsList').innerHTML = adminHtml;
         }
 
-        window.addToCart = function(name, priceStr) {
+        window.addToCart = function(name, priceStr, stockStatus) {
+            if (stockStatus === 'out') {
+                alert("عذراً، هذا المنتج غير متوفر حالياً.");
+                return;
+            }
             let numericPrice = parseFloat(priceStr.replace(/[^0-9.]/g, '')) || 0;
             let existing = cart.find(item => item.name === name);
             if (existing) {
@@ -634,7 +656,6 @@
                     createdAt: serverTimestamp()
                 });
 
-                // تحديث النقاط (كل 10 ريال نقطة مثلاً أو حسب الرغبة)
                 let earnedPoints = Math.floor(totalPrice / 10);
                 let userRef = doc(db, "users", currentPhone);
                 let userSnap = await getDoc(userRef);
@@ -654,7 +675,6 @@
             }
         }
 
-        // الاستماع للطلبات وتحديث السجل ولوحة التحكم
         onSnapshot(collection(db, "orders"), (snapshot) => {
             let historyHtml = "";
             let adminOrdersHtml = "";
@@ -723,7 +743,6 @@
             }
         }
 
-        // جلب قائمة العملاء
         onSnapshot(collection(db, "users"), (snapshot) => {
             let usersHtml = "";
             snapshot.forEach(docSnap => {
