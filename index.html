@@ -388,6 +388,45 @@
         let allProductsCache = [];
         let allProductsRaw = [];
 
+        // متغير للتحكم بتنبيه الطلبات الجديدة وعدم تشغيل الصوت عند فتح التطبيق لأول مرة
+        let isInitialOrderLoad = true;
+
+        // دالة توليد صوت تنبيه تفاعلي (مماثل لصوت تطبيقات التوصيل مثل جاهز عبر تقنية Web Audio API)
+        function playJahezAlertSound() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // نغمة أولى
+                const osc1 = audioCtx.createOscillator();
+                const gain1 = audioCtx.createGain();
+                osc1.type = 'sine';
+                osc1.frequency.setValueAtTime(587.33, audioCtx.currentTime); // نغمة D5
+                gain1.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain1.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+                osc1.connect(gain1);
+                gain1.connect(audioCtx.destination);
+                osc1.start();
+                osc1.stop(audioCtx.currentTime + 0.15);
+
+                // نغمة ثانية أعلى (تشبه صوت التنبيه المميز لجاهز)
+                setTimeout(() => {
+                    const osc2 = audioCtx.createOscillator();
+                    const gain2 = audioCtx.createGain();
+                    osc2.type = 'sine';
+                    osc2.frequency.setValueAtTime(880, audioCtx.currentTime); // نغمة A5
+                    gain2.gain.setValueAtTime(0.4, audioCtx.currentTime);
+                    gain2.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                    osc2.connect(gain2);
+                    gain2.connect(audioCtx.destination);
+                    osc2.start();
+                    osc2.stop(audioCtx.currentTime + 0.3);
+                }, 120);
+
+            } catch(e) {
+                console.log("Audio context blocked or not supported");
+            }
+        }
+
         if (currentUser && currentPhone) {
             initAppSession();
         }
@@ -703,7 +742,7 @@
                     customerName: currentUser,
                     customerPhone: phone,
                     location, notes, items: cart, totalPrice,
-                    deliveryFee: 0, // قيمة التوصيل الافتراضية يحددها الأدمن لاحقاً
+                    deliveryFee: 0, 
                     status: "قيد المراجعة 🕒",
                     createdAt: serverTimestamp()
                 });
@@ -721,7 +760,7 @@
             } catch(e) { alert("حدث خطأ أثناء الإرسال."); }
         }
 
-        // جلب الطلبات مرتبة تنازلياً حسب الوقت (الأحدث أولاً)
+        // جلب الطلبات مرتبة تنازلياً حسب الوقت (الأحدث أولاً) مع تفعيل صوت التنبيه للطلبات الجديدة
         const ordersQuery = query(collection(db, "orders"), orderBy("createdAt", "desc"));
 
         onSnapshot(ordersQuery, (snapshot) => {
@@ -729,6 +768,15 @@
             let adminOrdersHtml = "";
             let adminRoutingHtml = "";
             let myOrders = [];
+
+            // فحص هل هناك طلبات جديدة أضيفت بعد فتح التطبيق لتشغيل صوت التنبيه
+            if (!isInitialOrderLoad && snapshot.docChanges()) {
+                let hasNewAddedOrder = snapshot.docChanges().some(change => change.type === "added");
+                if (hasNewAddedOrder) {
+                    playJahezAlertSound();
+                }
+            }
+            isInitialOrderLoad = false;
 
             snapshot.forEach(docSnap => {
                 let order = docSnap.data();
@@ -738,7 +786,6 @@
                     myOrders.push(order);
                 }
 
-                // بناء قائمة المنتجات بالصور والأسماء والأسعار للوحة الأدمن وسجل العميل
                 let productsDetailsHtml = "";
                 if (order.items && order.items.length > 0) {
                     order.items.forEach(item => {
@@ -762,7 +809,6 @@
                 let deliveryFeeVal = order.deliveryFee !== undefined ? order.deliveryFee : 0;
                 let finalTotal = (order.totalPrice || 0) + Number(deliveryFeeVal);
 
-                // كارد الطلب في لوحة الأدمن مع خانة لتحديد قيمة التوصيل
                 adminOrdersHtml += `
                     <div class="order-card">
                         <p style="color: #e74c3c; font-weight: bold; margin-bottom: 5px;">🔔 رقم الطلب: #${order.id.slice(0, 6).toUpperCase()} | ⏰ الوقت: ${timeString}</p>
@@ -796,12 +842,12 @@
                 if (order.customerPhone === currentPhone) {
                     historyHtml += `
                         <div class="order-card" style="border: 1px solid #222; border-right: 5px solid #d4af37; box-shadow: none;">
-                            <p><b>رقم الطلب:</b> ${o.id.slice(0,6).toUpperCase()}</p>
+                            <p><b>رقم الطلب:</b> ${order.id.slice(0,6).toUpperCase()}</p>
                             <div style="margin: 8px 0;">${productsDetailsHtml}</div>
-                            <p><b>سعر المنتجات:</b> ${o.totalPrice || 0} ريال</p>
+                            <p><b>سعر المنتجات:</b> ${order.totalPrice || 0} ريال</p>
                             <p><b>قيمة التوصيل:</b> ${deliveryFeeVal} ريال</p>
                             <p style="color:#27ae60; font-weight:bold;"><b>الإجمالي النهائي:</b> ${finalTotal} ريال</p>
-                            <p style="margin-top:5px;"><b>الحالة:</b> <span class="status-badge">${o.status || 'قيد المراجعة'}</span></p>
+                            <p style="margin-top:5px;"><b>الحالة:</b> <span class="status-badge">${order.status || 'قيد المراجعة'}</span></p>
                         </div>
                     `;
                 }
@@ -824,7 +870,6 @@
             document.getElementById('adminRoutingList').innerHTML = adminRoutingHtml || "<p style='color:#777;'>لا توجد أرقام.</p>";
         });
 
-        // دالة حفظ قيمة التوصيل التي يحددها الأدمن للطلب
         window.saveDeliveryFee = async function(orderId) {
             let feeInput = document.getElementById(`deliveryFeeInput_${orderId}`).value;
             let feeValue = parseFloat(feeInput) || 0;
