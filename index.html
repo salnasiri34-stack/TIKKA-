@@ -334,7 +334,7 @@
         }
     </script>
 
-    <!-- سكربت Firebase والمنطق البرمجي المعدل -->
+    <!-- سكربت Firebase والمنطق البرمجي المعدل والمحصن -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, deleteDoc, onSnapshot, updateDoc, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -597,7 +597,6 @@
             document.getElementById('adminProductsList').innerHTML = adminHtml;
         }
 
-        // استخدام الـ ID بدلاً من الاسم لمنع مشاكل الأخطاء في الأسماء التي تحوي اقتباسات
         window.addToCart = function(productId) {
             let p = allProductsCache.find(item => item.id === productId);
             if (!p || p.stockStatus === 'out') { return; }
@@ -707,12 +706,12 @@
                 
                 adminOrdersHtml += `
                     <div class="order-card">
-                        <p><b>العميل:</b> ${order.customerName} (${order.customerPhone})</p>
+                        <p><b>العميل:</b> ${order.customerName || 'بدون اسم'} (${order.customerPhone || 'بدون رقم'})</p>
                         <p><b>الطلبات:</b> ${itemsListText}</p>
-                        <p><b>الموقع:</b> ${order.location}</p>
+                        <p><b>الموقع:</b> ${order.location || 'غير محدد'}</p>
                         <p><b>الملاحظات:</b> ${order.notes || 'لا توجد'}</p>
-                        <p><b>المبلغ:</b> ${order.totalPrice} ريال</p>
-                        <p style="margin-top:5px;"><b>الحالة:</b> <span class="status-badge">${order.status}</span></p>
+                        <p><b>المبلغ:</b> ${order.totalPrice || 0} ريال</p>
+                        <p style="margin-top:5px;"><b>الحالة:</b> <span class="status-badge">${order.status || 'قيد المراجعة'}</span></p>
                         <div style="margin-top:8px; display:flex; gap:6px;">
                             <button class="logout-btn" onclick="updateOrderStatus('${order.id}', 'جاري التوصيل 🛵')">جاري التوصيل</button>
                             <button class="logout-btn" style="background:#27ae60; color:#fff;" onclick="updateOrderStatus('${order.id}', 'تم التوصيل بنجاح ✅')">تم التوصيل</button>
@@ -720,10 +719,12 @@
                     </div>
                 `;
 
+                // كود آمن 100% لتنظيف رقم الجوال ومنع خطأ الـ replace
+                let cleanPhone = (order.customerPhone || '').toString().replace(/^0/, '');
                 adminRoutingHtml += `
                     <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #222; font-size:13px;">
-                        <span><b>${order.customerName}</b> (${order.customerPhone})</span>
-                        <a href="https://wa.me/966${order.customerPhone.replace(/^0/, '')}?text=${encodeURIComponent('مرحباً يا ' + order.customerName + '، بخصوص طلبك من تكة 🛵')}" target="_blank" style="background:#27ae60; color:#fff; padding:5px 10px; border-radius:6px; text-decoration:none; font-size:12px; font-weight:bold;">واتساب 🟢</a>
+                        <span><b>${order.customerName || 'عميل'}</b> (${order.customerPhone || ''})</span>
+                        <a href="https://wa.me/966${cleanPhone}?text=${encodeURIComponent('مرحباً يا ' + (order.customerName || '') + '، بخصوص طلبك من تكة 🛵')}" target="_blank" style="background:#27ae60; color:#fff; padding:5px 10px; border-radius:6px; text-decoration:none; font-size:12px; font-weight:bold;">واتساب 🟢</a>
                     </div>
                 `;
             });
@@ -737,8 +738,8 @@
                         <div class="order-card">
                             <p><b>رقم الطلب:</b> ${o.id.slice(0,6)}</p>
                             <p><b>المنتجات:</b> ${itemsTxt}</p>
-                            <p><b>المبلغ:</b> ${o.totalPrice} ريال</p>
-                            <p style="margin-top:5px;"><b>الحالة:</b> <span class="status-badge">${o.status}</span></p>
+                            <p><b>المبلغ:</b> ${o.totalPrice || 0} ريال</p>
+                            <p style="margin-top:5px;"><b>الحالة:</b> <span class="status-badge">${o.status || 'قيد المراجعة'}</span></p>
                         </div>
                     `;
                 });
@@ -759,7 +760,7 @@
                 let u = docSnap.data();
                 usersHtml += `
                     <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #222; font-size:13px;">
-                        <span><b>${u.name}</b> (${u.phone})</span>
+                        <span><b>${u.name || 'بدون اسم'}</b> (${u.phone || 'بدون رقم'})</span>
                         <span style="color:#d4af37; font-weight:bold;">${u.points || 0} نقطة</span>
                     </div>
                 `;
